@@ -13,6 +13,8 @@ A reusable GitHub Actions workflow for generating Swift test coverage reports wi
 
 ## Usage
 
+📋 **For a complete usage example, see [usage-example.yml](usage-example.yml)**
+
 ### Basic Usage
 
 ```yaml
