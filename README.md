@@ -4,11 +4,12 @@ A reusable GitHub Actions workflow for generating Swift test coverage reports wi
 
 ## Features
 
-- 🧪 Runs Swift tests with coverage enabled
+- 🧪 Runs Swift tests with coverage enabled using **Swift Testing** framework
 - 📊 Generates coverage reports in markdown table format
 - 💬 Automatically comments on pull requests with coverage data
 - 🔧 Configurable Xcode version, project name, and source paths
 - 📤 Outputs coverage percentage for use in other jobs
+- ✅ **Compatible with latest Swift Testing library**
 
 ## Usage
 
@@ -76,20 +77,20 @@ This workflow works with **any Swift project** that uses `swift test`:
 
 **Swift Package:**
 ```yaml
-uses: "oleksiikolomiietssnapp/.../swift-coverage.yml@main"
+uses: "oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main"
 # Uses default: {ProjectName}/Sources/
 ```
 
 **iOS App:**
 ```yaml
-uses: "oleksiikolomiietssnapp/.../swift-coverage.yml@main"
+uses: "oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main"
 with:
   source-path-override: "MyApp/MyApp"
 ```
 
 **Multi-module project:**
 ```yaml
-uses: "oleksiikolomiietssnapp/.../swift-coverage.yml@main"
+uses: "oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main"
 with:
   source-path-override: "Sources/Core"
 ```
@@ -97,7 +98,7 @@ with:
 ## Requirements
 
 - Any Swift project that supports `swift test`
-- Swift Testing framework enabled
+- **Swift Testing framework** (works with latest version)
 - macOS runner (uses Xcode)
 
 ## Setup
