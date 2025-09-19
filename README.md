@@ -76,20 +76,20 @@ This workflow works with **any Swift project** that uses `swift test`:
 
 **Swift Package:**
 ```yaml
-uses: owner/.../swift-coverage.yml@main
+uses: "oleksiikolomiietssnapp/.../swift-coverage.yml@main"
 # Uses default: {ProjectName}/Sources/
 ```
 
 **iOS App:**
 ```yaml
-uses: owner/.../swift-coverage.yml@main
+uses: "oleksiikolomiietssnapp/.../swift-coverage.yml@main"
 with:
   source-path-override: "MyApp/MyApp"
 ```
 
 **Multi-module project:**
 ```yaml
-uses: owner/.../swift-coverage.yml@main
+uses: "oleksiikolomiietssnapp/.../swift-coverage.yml@main"
 with:
   source-path-override: "Sources/Core"
 ```
