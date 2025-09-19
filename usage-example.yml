@@ -1,0 +1,31 @@
+# Example usage of the reusable Swift coverage workflow
+# Place this in your repository's .github/workflows/ folder
+
+name: Test and Coverage
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  coverage:
+    uses: "oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main"
+    with:
+      xcode-version: "16.2"
+      # Optional: Override project name (defaults to repository name)
+      # project-name-override: "MyCustomProject"
+      # Optional: Override source path pattern
+      # source-path-override: "MyProject/Sources"
+      # Optional: Customize coverage comment header
+      # coverage-comment-header: "### 📊 Test Coverage"
+
+  # Optional: Use coverage output in other jobs
+  post-coverage:
+    needs: coverage
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Print coverage
+        run: echo "Coverage is ${{ needs.coverage.outputs.coverage-percentage }}%"
