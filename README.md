@@ -1,6 +1,8 @@
-# Swift Coverage Reusable Workflow
+# Swift Coverage Action
 
 A reusable GitHub Actions workflow for generating Swift test coverage reports with PR comments.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
 
@@ -28,7 +30,7 @@ on:
 
 jobs:
   coverage:
-    uses: "oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main"
+    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@v0.1.0
 ```
 
 ### Advanced Usage
@@ -36,12 +38,24 @@ jobs:
 ```yaml
 jobs:
   coverage:
-    uses: "oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main"
+    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@v0.1.0
     with:
       xcode-version: "16.2"
       project-name-override: "MyCustomProject"
       source-path-override: "MyProject/Sources"
       coverage-comment-header: "### 📊 Test Coverage"
+```
+
+### Version Pinning
+
+**Recommended (stable):**
+```yaml
+uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@v0.1.0
+```
+
+**Latest (for testing):**
+```yaml
+uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main
 ```
 
 ## Inputs
@@ -79,20 +93,20 @@ This workflow works with **any Swift project** that uses `swift test`:
 
 **Swift Package:**
 ```yaml
-uses: "oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main"
+uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@v0.1.0
 # Uses default: {ProjectName}/Sources/
 ```
 
 **iOS App:**
 ```yaml
-uses: "oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main"
+uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@v0.1.0
 with:
   source-path-override: "MyApp/MyApp"
 ```
 
 **Multi-module project:**
 ```yaml
-uses: "oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main"
+uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@v0.1.0
 with:
   source-path-override: "Sources/Core"
 ```
@@ -105,10 +119,20 @@ with:
 
 ## Setup
 
-1. Create a public repository for your reusable workflows
-2. Add the `swift-coverage.yml` file to `.github/workflows/`
-3. Tag a release or use `@main` for latest version
-4. Reference in other repositories using the `uses` syntax
+1. Add the workflow to your Swift project's `.github/workflows/` directory
+2. Configure inputs as needed for your project structure
+3. Push to trigger the workflow on your next PR or commit to main
+
+## Contributing
+
+This is an open-source project. Feel free to:
+- Report issues
+- Submit feature requests
+- Contribute improvements via pull requests
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Example Output
 
