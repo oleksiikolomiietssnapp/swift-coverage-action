@@ -25,7 +25,7 @@ on:
 
 jobs:
   coverage:
-    uses: owner/swift-coverage-workflows/.github/workflows/swift-coverage.yml@main
+    uses: "oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main"
 ```
 
 ### Advanced Usage
@@ -33,7 +33,7 @@ jobs:
 ```yaml
 jobs:
   coverage:
-    uses: owner/swift-coverage-workflows/.github/workflows/swift-coverage.yml@main
+    uses: "oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main"
     with:
       xcode-version: "16.2"
       project-name-override: "MyCustomProject"
