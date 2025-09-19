@@ -1,8 +1,8 @@
 # Example usage of Swift Coverage Action
 # Place this file in your repository's .github/workflows/ folder
 #
-# For latest version, replace @v0.1.0 with @main
-# For stability, pin to a specific version like @v0.1.0
+# For latest version, replace @0.1.0 with @main
+# For stability, pin to a specific version like @0.1.0
 
 name: Test and Coverage
 
@@ -14,7 +14,7 @@ on:
 
 jobs:
   coverage:
-    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@v0.1.0
+    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.0
     with:
       xcode-version: "16.2"
       # Optional: Override project name (defaults to repository name)
