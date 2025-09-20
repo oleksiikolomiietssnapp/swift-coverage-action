@@ -1,0 +1,89 @@
+name: Test Sample Multi-Target Package
+
+on:
+  push:
+    branches: [ "main" ]
+    paths: [ "sample/**" ]
+  pull_request:
+    branches: [ "main" ]
+    paths: [ "sample/**" ]
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  test-sample:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: ./sample
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: List Xcode installations
+      run: sudo ls -1 /Applications | grep "Xcode"
+
+    - name: Select Xcode 16.2
+      run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+
+    - name: Run Sample Package Tests with Coverage
+      run: |
+        swift test --enable-swift-testing --enable-code-coverage
+        CODECOV_PATH=$(swift test --enable-swift-testing --enable-code-coverage --show-codecov-path)
+        echo "CODECOV_PATH=$CODECOV_PATH" >> $GITHUB_ENV
+
+    - name: Test Coverage Action on Sample
+      id: coverage
+      run: |
+        # Set up environment like the action would
+        PROJECT_NAME="SampleMultiTarget"
+        SOURCE_PATH="SampleMultiTarget/Sources"
+        COVERAGE_SUMMARY_FILE="coverage_summary.txt"
+
+        echo "Using PROJECT_NAME: $PROJECT_NAME"
+        echo "Using CODECOV_PATH: $CODECOV_PATH"
+
+        # Run the same logic as our action (simplified version for testing)
+        SOURCE_FILE_COUNT=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("/\\.(swift|m|mm)$")) | select(.filename | test("/(Tests?|test)/") | not) | .filename' "$CODECOV_PATH" | wc -l)
+
+        if [ "$SOURCE_FILE_COUNT" -eq 0 ]; then
+          ALL_FILES="$PROJECT_NAME|0|0"
+        else
+          ALL_FILES=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("/\\.(swift|m|mm)$")) | select(.filename | test("/(Tests?|test)/") | not) | "\(.filename)|\(.summary.lines.count)|\(.summary.lines.covered)"' "$CODECOV_PATH")
+        fi
+
+        echo "Found source files:"
+        echo "$ALL_FILES"
+
+        # Create coverage summary
+        cat <<EOF > $COVERAGE_SUMMARY_FILE
+        |   №  | Name | Executable Lines | Coverage |
+        |:----:|------|-----------------:|---------:|
+        EOF
+
+        if [ -n "$ALL_FILES" ]; then
+          counter=1
+          echo "$ALL_FILES" | while IFS='|' read -r filename total_lines covered_lines; do
+            if [ -n "$filename" ]; then
+              # Extract target name from file path
+              target_name=""
+              if echo "$filename" | grep -q '/[^/]*/Sources/'; then
+                target_name=$(echo "$filename" | sed -E 's|.*/([^/]+)/Sources/.*|\1|')
+              else
+                target_name="$PROJECT_NAME"
+              fi
+
+              if [ $total_lines -gt 0 ]; then
+                coverage=$(echo "scale=2; $covered_lines * 100 / $total_lines" | bc)
+              else
+                coverage=0
+              fi
+
+              echo "| $counter | $target_name | $total_lines | **${coverage}%** |" >> $COVERAGE_SUMMARY_FILE
+              counter=$((counter + 1))
+            fi
+          done
+        fi
+
+        # Display results
+        echo "Coverage Summary:"
+        cat $COVERAGE_SUMMARY_FILE
