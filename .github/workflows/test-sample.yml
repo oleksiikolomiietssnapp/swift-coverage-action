@@ -10,42 +10,7 @@ on:
   workflow_dispatch: # Allow manual triggering
 
 jobs:
-  test-sample:
-    runs-on: macos-latest
-    defaults:
-      run:
-        working-directory: ./sample
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: List Xcode installations
-      run: sudo ls -1 /Applications | grep "Xcode"
-
-    - name: Select Xcode 16.2
-      run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
-
-    - name: Run Sample Package Tests with Coverage
-      run: |
-        swift test --enable-swift-testing --enable-code-coverage
-        CODECOV_PATH=$(swift test --enable-swift-testing --enable-code-coverage --show-codecov-path)
-        echo "CODECOV_PATH=$CODECOV_PATH" >> $GITHUB_ENV
-
-    - name: Debug Coverage Data
-      run: |
-        echo "Debug - Coverage file contents:"
-        echo "CODECOV_PATH: $CODECOV_PATH"
-
-        echo "Debug - Coverage data structure:"
-        jq '.data[0] | keys' "$CODECOV_PATH"
-
-        echo "Debug - All files in coverage:"
-        jq -r '.data[0].files[].filename' "$CODECOV_PATH"
-
-        echo "Debug - Files with line counts:"
-        jq -r '.data[0].files[] | "\(.filename) - lines: \(.summary.lines.count), covered: \(.summary.lines.covered)"' "$CODECOV_PATH"
-
-  test-with-main-action:
+  coverage:
     uses: ./.github/workflows/swift-coverage.yml
     with:
       project-name-override: "SampleMultiTarget"
