@@ -1,0 +1,14 @@
+name: Test Sample Multi-Target Package
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  coverage:
+    uses: ../../../.github/workflows/swift-coverage.yml
+    with:
+      project-name-override: "SampleMultiTarget"
+      coverage-comment-header: "### 📊 Sample Multi-Target Coverage"
