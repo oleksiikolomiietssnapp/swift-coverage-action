@@ -74,16 +74,26 @@ jobs:
         fi
 
 
+        # Debug: Show what we're looking for vs what we found
+        echo "Debug - Looking for source path pattern: $SOURCE_PATH"
+        echo "Debug - All Swift files excluding build artifacts and tests:"
+        jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("/\\.(swift|m|mm)$")) | select(.filename | test("/(Tests?|test)/") | not) | .filename' "$CODECOV_PATH"
+
         # Check if there are any actual source files to report on
         SOURCE_FILE_COUNT=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("/\\.(swift|m|mm)$")) | select(.filename | test("/(Tests?|test)/") | not) | .filename' "$CODECOV_PATH" | wc -l)
+
+        echo "Debug - Found $SOURCE_FILE_COUNT source files"
 
         if [ "$SOURCE_FILE_COUNT" -eq 0 ]; then
           # Create a placeholder entry when no source files exist
           ALL_FILES="$PROJECT_NAME|0|0"
         else
-          # Extract all Swift files excluding build artifacts
+          # Extract all Swift files excluding build artifacts (simplified - don't filter by SOURCE_PATH since we're grouping by target anyway)
           ALL_FILES=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("/\\.(swift|m|mm)$")) | select(.filename | test("/(Tests?|test)/") | not) | "\(.filename)|\(.summary.lines.count)|\(.summary.lines.covered)"' "$CODECOV_PATH")
         fi
+
+        echo "Debug - Extracted files data:"
+        echo "$ALL_FILES"
 
         # Initialize table
         cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
