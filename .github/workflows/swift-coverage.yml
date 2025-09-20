@@ -78,10 +78,23 @@ jobs:
         fi
 
 
+        # Debug the filtering step by step
+        echo "Debug - All files in coverage data:"
+        jq -r '.data[0].files[].filename' "$CODECOV_PATH" | head -10
+
+        echo "Debug - After excluding .build:"
+        jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | .filename' "$CODECOV_PATH"
+
+        echo "Debug - After including only Swift files:"
+        jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("/\\.(swift|m|mm)$")) | .filename' "$CODECOV_PATH"
+
+        echo "Debug - After excluding test files:"
+        jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("/\\.(swift|m|mm)$")) | select(.filename | test("/(Tests?|test)/") | not) | .filename' "$CODECOV_PATH"
+
         # Check if there are any actual source files to report on
         SOURCE_FILE_COUNT=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("/\\.(swift|m|mm)$")) | select(.filename | test("/(Tests?|test)/") | not) | .filename' "$CODECOV_PATH" | wc -l)
 
-        echo "Debug - Source file count: $SOURCE_FILE_COUNT"
+        echo "Debug - Final source file count: $SOURCE_FILE_COUNT"
 
         if [ "$SOURCE_FILE_COUNT" -eq 0 ]; then
           echo "Debug - No source files found, using placeholder"
