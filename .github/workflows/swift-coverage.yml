@@ -86,6 +86,12 @@ jobs:
           # Get target name
           TARGET_NAME=$(jq -r --argjson index $i '.data[$index].name // "Target"' "$CODECOV_PATH")
 
+          # Skip test targets
+          if [[ "$TARGET_NAME" =~ [Tt]est ]]; then
+            echo "Skipping test target: $TARGET_NAME"
+            continue
+          fi
+
           # Extract files for this target
           FILES_LINE_COUNTS=$(jq -r --arg source_path "$SOURCE_PATH" --argjson index $i '.data[$index].files[] | select(.filename | contains($source_path)) | .summary.lines' "$CODECOV_PATH")
 
