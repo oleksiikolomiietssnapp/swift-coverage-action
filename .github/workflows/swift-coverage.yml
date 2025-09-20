@@ -72,6 +72,12 @@ jobs:
         TARGET_COUNT=$(jq '.data | length' "$CODECOV_PATH")
         echo "Found $TARGET_COUNT target(s)"
 
+        # Debug: Show structure of coverage data
+        echo "Debug - Coverage data structure:"
+        jq '.data[0] | keys' "$CODECOV_PATH"
+        echo "Debug - First few files:"
+        jq -r '.data[0].files[0:3][].filename' "$CODECOV_PATH"
+
         # Initialize table
         cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
         |   №  | Name | Executable Lines | Coverage |
