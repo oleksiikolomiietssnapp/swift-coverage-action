@@ -7,9 +7,10 @@ A reusable GitHub Actions workflow for generating Swift test coverage reports wi
 ## Features
 
 - 🧪 Runs Swift tests with coverage enabled using **Swift Testing** framework
-- 📊 Generates coverage reports in markdown table format
+- 📊 Generates coverage reports in markdown table format with **multi-target support**
 - 💬 Automatically comments on pull requests with coverage data
-- 🔧 Configurable Xcode version, project name, and source paths
+- 🎯 **Detects and reports coverage for each target separately** (Swift Package Manager)
+- 🔧 Configurable Xcode version, project name, source paths, and working directory
 - 📤 Outputs coverage percentage for use in other jobs
 - ✅ **Compatible with latest Swift Testing library**
 
@@ -66,6 +67,7 @@ uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-cover
 | `source-path-override` | Override source path pattern for coverage filtering | No | `{PROJECT}/Sources` |
 | `project-name-override` | Override project name | No | Repository name |
 | `coverage-comment-header` | Header for coverage comment | No | `### 🛡️ Code Coverage Report` |
+| `working-directory` | Working directory for Swift commands | No | `.` (repository root) |
 
 ## Outputs
 
@@ -111,6 +113,13 @@ with:
   source-path-override: "Sources/Core"
 ```
 
+**Project in subdirectory:**
+```yaml
+uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.0
+with:
+  working-directory: "./my-swift-package"
+```
+
 ## Requirements
 
 - Any Swift project that supports `swift test`
@@ -136,8 +145,25 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Example Output
 
-The workflow generates a coverage table like this:
+The workflow generates coverage tables with automatic target detection:
 
-| ID | Name | Executable Lines | Coverage |
-|----|------|-----------------:|---------:|
-| 0 | MyProject | 150 | **87.33%** |
+### Single Target Project
+|   №  | Name | Executable Lines | Coverage |
+|:----:|------|-----------------:|---------:|
+| 1 | MyProject | 150 | **87.33%** |
+
+### Multi-Target Project (Swift Package Manager)
+|   №  | Name | Executable Lines | Coverage |
+|:----:|------|-----------------:|---------:|
+| 1 | CoreLibrary | 58 | **89.66%** |
+| 2 | UtilsLibrary | 77 | **49.35%** |
+
+## Sample Multi-Target Package
+
+This repository includes a complete [sample Swift Package](sample/) with multiple targets to demonstrate the action's multi-target capabilities. The sample shows realistic coverage scenarios with:
+
+- **CoreLibrary** - Core mathematical operations (high coverage)
+- **UtilsLibrary** - Utility functions with dependencies (partial coverage)
+- **Comprehensive tests** - Demonstrating real-world testing patterns
+
+See the [sample README](sample/README.md) for details.
