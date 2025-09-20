@@ -21,6 +21,11 @@ on:
         required: false
         type: string
         default: '### 🛡️ Code Coverage Report'
+      working-directory:
+        description: 'Working directory for Swift commands (default: repository root)'
+        required: false
+        type: string
+        default: '.'
     outputs:
       coverage-percentage:
         description: 'The calculated coverage percentage'
@@ -35,6 +40,9 @@ jobs:
     runs-on: macos-latest
     outputs:
       coverage: ${{ steps.extract.outputs.coverage }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
 
     steps:
     - uses: actions/checkout@v4
