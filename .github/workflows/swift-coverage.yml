@@ -155,23 +155,32 @@ jobs:
         target_count=0
 
         if [ -s "$AGGREGATED_DATA" ]; then
-          sort "$AGGREGATED_DATA" | while IFS='|' read -r target_name total_lines covered_lines; do
-            if [ $total_lines -gt 0 ]; then
-              target_coverage=$(echo "scale=6; $covered_lines * 100 / $total_lines" | bc)
-            else
-              target_coverage=0
+          # Process each target and add to table
+          while IFS='|' read -r target_name total_lines covered_lines; do
+            if [ -n "$target_name" ]; then
+              if [ $total_lines -gt 0 ]; then
+                target_coverage=$(echo "scale=6; $covered_lines * 100 / $total_lines" | bc)
+              else
+                target_coverage=0
+              fi
+
+              target_coverage_rounded=$(echo "$target_coverage" | awk '{print int($1 * 100 + 0.5) / 100}')
+              target_coverage_with_percentage="${target_coverage_rounded}%"
+
+              # Add target row to table
+              echo "| $target_counter | $target_name | $total_lines | **$target_coverage_with_percentage** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+
+              # For overall average calculation
+              echo "$target_coverage" >> /tmp/coverage_values.txt
+              target_counter=$((target_counter + 1))
+
+              echo "Debug - Added target: $target_name with $total_lines lines, ${target_coverage_rounded}% coverage"
             fi
-
-            target_coverage_rounded=$(echo "$target_coverage" | awk '{print int($1 * 100 + 0.5) / 100}')
-            target_coverage_with_percentage="${target_coverage_rounded}%"
-
-            # Add target row to table
-            echo "| $target_counter | $target_name | $total_lines | **$target_coverage_with_percentage** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
-
-            # For overall average calculation
-            echo "$target_coverage" >> /tmp/coverage_values.txt
-            target_counter=$((target_counter + 1))
-          done
+          done < <(sort "$AGGREGATED_DATA")
+        else
+          echo "Debug - No aggregated data found, using fallback"
+          # Fallback: add a single entry with project name
+          echo "| 1 | $PROJECT_NAME | 0 | **0%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
         fi
 
         # Calculate overall average coverage
