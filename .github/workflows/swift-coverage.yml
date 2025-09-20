@@ -33,7 +33,7 @@ on:
 
 env:
   XCODE_PATH: '/Applications/Xcode_${{ inputs.xcode-version }}.app/Contents/Developer'
-  COVERAGE_SUMMARY_FILE: 'coverage_summary.txt'
+  COVERAGE_SUMMARY_FILE: '${{ github.workspace }}/coverage_summary.txt'
 
 jobs:
   coverage:
