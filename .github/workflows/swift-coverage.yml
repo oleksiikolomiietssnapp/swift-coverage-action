@@ -68,15 +68,8 @@ jobs:
         echo "Using PROJECT_NAME: $PROJECT_NAME"
         echo "Using SOURCE_PATH: $SOURCE_PATH"
 
-        # Extract coverage data and iterate through all targets
-        TARGET_COUNT=$(jq '.data | length' "$CODECOV_PATH")
-        echo "Found $TARGET_COUNT target(s)"
-
-        # Debug: Show structure of coverage data
-        echo "Debug - Coverage data structure:"
-        jq '.data[0] | keys' "$CODECOV_PATH"
-        echo "Debug - First few files:"
-        jq -r '.data[0].files[0:3][].filename' "$CODECOV_PATH"
+        # Extract all source files from coverage data, excluding test files and build artifacts
+        ALL_FILES=$(jq -r '.data[0].files[] | select(.filename | test("/(Tests?|test)/") | not) | select(.filename | test("/\\.build/") | not) | select(.filename | test("/Sources/|/src/") or (test("/\\.(swift|m|mm)$") and test("/Tests?/") | not)) | "\(.filename)|\(.summary.lines.count)|\(.summary.lines.covered)"' "$CODECOV_PATH")
 
         # Initialize table
         cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
@@ -84,37 +77,53 @@ jobs:
         |:----:|------|-----------------:|---------:|
         EOF
 
-        total_coverage_sum=0
-        target_counter=1
+        # Group files by target name and calculate coverage
+        declare -A target_totals
+        declare -A target_covered
+        declare -A target_names
 
-        # Loop through each target in .data[]
-        for ((i=0; i<TARGET_COUNT; i++)); do
-          # Get target name
-          TARGET_NAME=$(jq -r --argjson index $i '.data[$index].name // "Target"' "$CODECOV_PATH")
+        # Parse files and group by target
+        while IFS='|' read -r filename total_lines covered_lines; do
+          if [ -n "$filename" ]; then
+            # Extract target name from file path patterns:
+            # Pattern 1: /path/to/TargetName/Sources/...
+            # Pattern 2: /path/to/Sources/TargetName/...
+            # Pattern 3: /path/to/TargetName/...
+            target_name=""
 
-          # Skip test targets
-          if [[ "$TARGET_NAME" =~ [Tt]est ]]; then
-            echo "Skipping test target: $TARGET_NAME"
-            continue
+            if [[ "$filename" =~ /([^/]+)/Sources/ ]]; then
+              target_name="${BASH_REMATCH[1]}"
+            elif [[ "$filename" =~ /Sources/([^/]+)/ ]]; then
+              target_name="${BASH_REMATCH[1]}"
+            elif [[ "$filename" =~ /([^/]+)/[^/]+\.swift$ ]]; then
+              target_name="${BASH_REMATCH[1]}"
+            else
+              target_name="$PROJECT_NAME"
+            fi
+
+            # Skip if target name looks like a test
+            if [[ "$target_name" =~ [Tt]est ]]; then
+              continue
+            fi
+
+            # Accumulate totals for this target
+            target_totals["$target_name"]=$((${target_totals["$target_name"]:-0} + total_lines))
+            target_covered["$target_name"]=$((${target_covered["$target_name"]:-0} + covered_lines))
+            target_names["$target_name"]=1
           fi
+        done <<< "$ALL_FILES"
 
-          # Extract files for this target
-          FILES_LINE_COUNTS=$(jq -r --arg source_path "$SOURCE_PATH" --argjson index $i '.data[$index].files[] | select(.filename | contains($source_path)) | .summary.lines' "$CODECOV_PATH")
+        # Generate table rows for each target
+        target_counter=1
+        total_coverage_sum=0
+        target_count=0
 
-          target_total_lines=0
-          target_covered_lines=0
+        for target_name in $(printf '%s\n' "${!target_names[@]}" | sort); do
+          total_lines=${target_totals["$target_name"]}
+          covered_lines=${target_covered["$target_name"]}
 
-          # Loop through each file's line count data for this target
-          for lines_data in $(echo "$FILES_LINE_COUNTS" | jq -c '.'); do
-            total=$(echo "$lines_data" | jq '.count')
-            covered=$(echo "$lines_data" | jq '.covered')
-            target_total_lines=$((target_total_lines + total))
-            target_covered_lines=$((target_covered_lines + covered))
-          done
-
-          # Calculate coverage percentage for this target
-          if [ $target_total_lines -gt 0 ]; then
-            target_coverage=$(echo "scale=6; $target_covered_lines * 100 / $target_total_lines" | bc)
+          if [ $total_lines -gt 0 ]; then
+            target_coverage=$(echo "scale=6; $covered_lines * 100 / $total_lines" | bc)
           else
             target_coverage=0
           fi
@@ -123,15 +132,16 @@ jobs:
           target_coverage_with_percentage="${target_coverage_rounded}%"
 
           # Add target row to table
-          echo "| $target_counter | $TARGET_NAME | $target_total_lines | **$target_coverage_with_percentage** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+          echo "| $target_counter | $target_name | $total_lines | **$target_coverage_with_percentage** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
 
           total_coverage_sum=$(echo "$total_coverage_sum + $target_coverage" | bc)
           target_counter=$((target_counter + 1))
+          target_count=$((target_count + 1))
         done
 
         # Calculate overall average coverage
-        if [ $TARGET_COUNT -gt 0 ]; then
-          average_coverage=$(echo "scale=6; $total_coverage_sum / $TARGET_COUNT" | bc)
+        if [ $target_count -gt 0 ]; then
+          average_coverage=$(echo "scale=6; $total_coverage_sum / $target_count" | bc)
         else
           average_coverage=0
         fi
