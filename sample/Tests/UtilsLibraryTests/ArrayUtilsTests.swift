@@ -2,7 +2,6 @@ import Testing
 @testable import UtilsLibrary
 
 struct ArrayUtilsTests {
-
     @Test func testSum() {
         let utils = ArrayUtils()
         #expect(utils.sum([1, 2, 3, 4]) == 10)
