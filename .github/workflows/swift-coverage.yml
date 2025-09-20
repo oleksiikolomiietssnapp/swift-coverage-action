@@ -74,26 +74,16 @@ jobs:
         fi
 
 
-        # Debug: Show what we're looking for vs what we found
-        echo "Debug - Looking for source path pattern: $SOURCE_PATH"
-        echo "Debug - All Swift files excluding build artifacts and tests:"
-        jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("/\\.(swift|m|mm)$")) | select(.filename | test("/(Tests?|test)/") | not) | .filename' "$CODECOV_PATH"
-
         # Check if there are any actual source files to report on
         SOURCE_FILE_COUNT=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("/\\.(swift|m|mm)$")) | select(.filename | test("/(Tests?|test)/") | not) | .filename' "$CODECOV_PATH" | wc -l)
-
-        echo "Debug - Found $SOURCE_FILE_COUNT source files"
 
         if [ "$SOURCE_FILE_COUNT" -eq 0 ]; then
           # Create a placeholder entry when no source files exist
           ALL_FILES="$PROJECT_NAME|0|0"
         else
-          # Extract all Swift files excluding build artifacts (simplified - don't filter by SOURCE_PATH since we're grouping by target anyway)
+          # Extract all Swift files excluding build artifacts
           ALL_FILES=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("/\\.(swift|m|mm)$")) | select(.filename | test("/(Tests?|test)/") | not) | "\(.filename)|\(.summary.lines.count)|\(.summary.lines.covered)"' "$CODECOV_PATH")
         fi
-
-        echo "Debug - Extracted files data:"
-        echo "$ALL_FILES"
 
         # Initialize table
         cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
@@ -123,7 +113,6 @@ jobs:
               target_name="$PROJECT_NAME"
             fi
 
-            echo "Debug - File: $(basename "$filename"), extracted target: $target_name"
 
             # Skip if target name looks like a test
             if echo "$target_name" | grep -qi test; then
@@ -176,11 +165,9 @@ jobs:
               echo "$target_coverage" >> /tmp/coverage_values.txt
               target_counter=$((target_counter + 1))
 
-              echo "Debug - Added target: $target_name with $total_lines lines, ${target_coverage_rounded}% coverage"
             fi
           done < <(sort "$AGGREGATED_DATA")
         else
-          echo "Debug - No aggregated data found, using fallback"
           # Fallback: add a single entry with project name
           echo "| 1 | $PROJECT_NAME | 0 | **0%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
         fi
@@ -207,13 +194,8 @@ jobs:
         # Output for next steps
         echo "coverage=$average_coverage_rounded" >> $GITHUB_OUTPUT
 
-    - name: Display Coverage Summary
-      run: |
-        echo "Coverage Summary Generated:"
-        cat ${{ env.COVERAGE_SUMMARY_FILE }}
-
     - name: Comment on Pull Request
-      if: false  # Temporarily disabled to debug coverage extraction
+      if: github.event_name == 'pull_request'
       uses: actions/github-script@v7
       with:
         script: |
