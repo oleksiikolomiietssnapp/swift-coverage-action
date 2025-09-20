@@ -78,10 +78,13 @@ jobs:
           # Show all Swift files for debugging
           echo "All Swift files in coverage:"
           jq -r '.data[0].files[] | select(.filename | test("/\\.(swift|m|mm)$")) | .filename' "$CODECOV_PATH"
-        fi
 
-        # Extract all Swift files excluding build artifacts (more lenient approach)
-        ALL_FILES=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("/\\.(swift|m|mm)$")) | select(.filename | test("/(Tests?|test)/") | not) | "\(.filename)|\(.summary.lines.count)|\(.summary.lines.covered)"' "$CODECOV_PATH")
+          # Create a placeholder entry when no source files exist
+          ALL_FILES="No source files|0|0"
+        else
+          # Extract all Swift files excluding build artifacts (more lenient approach)
+          ALL_FILES=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("/\\.(swift|m|mm)$")) | select(.filename | test("/(Tests?|test)/") | not) | "\(.filename)|\(.summary.lines.count)|\(.summary.lines.covered)"' "$CODECOV_PATH")
+        fi
 
         # Initialize table
         cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
