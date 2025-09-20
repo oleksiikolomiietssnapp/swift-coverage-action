@@ -65,24 +65,15 @@ jobs:
           SOURCE_PATH="${PROJECT_NAME}/Sources"
         fi
 
-        echo "Using PROJECT_NAME: $PROJECT_NAME"
-        echo "Using SOURCE_PATH: $SOURCE_PATH"
 
         # Check if there are any actual source files to report on
         SOURCE_FILE_COUNT=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("/\\.(swift|m|mm)$")) | select(.filename | test("/(Tests?|test)/") | not) | .filename' "$CODECOV_PATH" | wc -l)
 
-        echo "Found $SOURCE_FILE_COUNT source files for coverage"
-
         if [ "$SOURCE_FILE_COUNT" -eq 0 ]; then
-          echo "No source files found - this might be a test-only package or coverage not generated for source files"
-          # Show all Swift files for debugging
-          echo "All Swift files in coverage:"
-          jq -r '.data[0].files[] | select(.filename | test("/\\.(swift|m|mm)$")) | .filename' "$CODECOV_PATH"
-
           # Create a placeholder entry when no source files exist
-          ALL_FILES="No source files|0|0"
+          ALL_FILES="$PROJECT_NAME|0|0"
         else
-          # Extract all Swift files excluding build artifacts (more lenient approach)
+          # Extract all Swift files excluding build artifacts
           ALL_FILES=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("/\\.(swift|m|mm)$")) | select(.filename | test("/(Tests?|test)/") | not) | "\(.filename)|\(.summary.lines.count)|\(.summary.lines.covered)"' "$CODECOV_PATH")
         fi
 
