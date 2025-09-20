@@ -1,3 +1,4 @@
+import Foundation
 import CoreLibrary
 
 /// String utility functions
