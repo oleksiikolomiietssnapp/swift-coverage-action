@@ -196,8 +196,13 @@ jobs:
         # Output for next steps
         echo "coverage=$average_coverage_rounded" >> $GITHUB_OUTPUT
 
+    - name: Display Coverage Summary
+      run: |
+        echo "Coverage Summary Generated:"
+        cat ${{ env.COVERAGE_SUMMARY_FILE }}
+
     - name: Comment on Pull Request
-      if: github.event_name == 'pull_request'
+      if: false  # Temporarily disabled to debug coverage extraction
       uses: actions/github-script@v7
       with:
         script: |
