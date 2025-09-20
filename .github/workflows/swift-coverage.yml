@@ -113,15 +113,17 @@ jobs:
             # Pattern 3: /path/to/TargetName/...
             target_name=""
 
-            if echo "$filename" | grep -q '/[^/]*/Sources/'; then
-              target_name=$(echo "$filename" | sed -E 's|.*/([^/]+)/Sources/.*|\1|')
-            elif echo "$filename" | grep -q '/Sources/[^/]*/'; then
+            if echo "$filename" | grep -q '/Sources/[^/]*/'; then
+              # Pattern: .../Sources/TargetName/...
               target_name=$(echo "$filename" | sed -E 's|.*/Sources/([^/]+)/.*|\1|')
-            elif echo "$filename" | grep -q '/[^/]*/[^/]*\.swift$'; then
-              target_name=$(echo "$filename" | sed -E 's|.*/([^/]+)/[^/]*\.swift$|\1|')
+            elif echo "$filename" | grep -q '/Sources/[^/]*\.swift$'; then
+              # Pattern: .../Sources/file.swift (direct in Sources)
+              target_name=$(echo "$filename" | sed -E 's|.*/Sources/([^/]*)\.swift$|\1|')
             else
               target_name="$PROJECT_NAME"
             fi
+
+            echo "Debug - File: $(basename "$filename"), extracted target: $target_name"
 
             # Skip if target name looks like a test
             if echo "$target_name" | grep -qi test; then
