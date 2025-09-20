@@ -68,8 +68,18 @@ jobs:
         echo "Using PROJECT_NAME: $PROJECT_NAME"
         echo "Using SOURCE_PATH: $SOURCE_PATH"
 
+        # Debug: Show all files first
+        echo "Debug - All files in coverage data:"
+        jq -r '.data[0].files[].filename' "$CODECOV_PATH" | head -10
+
         # Extract all source files from coverage data, excluding test files and build artifacts
         ALL_FILES=$(jq -r '.data[0].files[] | select(.filename | test("/(Tests?|test)/") | not) | select(.filename | test("/\\.build/") | not) | select(.filename | test("/Sources/|/src/") or (test("/\\.(swift|m|mm)$") and test("/Tests?/") | not)) | "\(.filename)|\(.summary.lines.count)|\(.summary.lines.covered)"' "$CODECOV_PATH")
+
+        echo "Debug - Filtered files count:"
+        echo "$ALL_FILES" | wc -l
+
+        echo "Debug - First few filtered files:"
+        echo "$ALL_FILES" | head -5
 
         # Initialize table
         cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
