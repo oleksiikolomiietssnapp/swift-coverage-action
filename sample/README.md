@@ -13,6 +13,7 @@ This is a sample Swift Package with **two targets** to demonstrate the Swift Cov
 2. **UtilsLibrary** - Utility functions that depend on CoreLibrary
    - `StringUtils.swift` - String manipulation utilities
    - `ArrayUtils.swift` - Array processing utilities
+   - `FontUtils.swift` - Cross-platform font utilities (iOS/macOS)
 
 ### Test Coverage
 
@@ -48,4 +49,6 @@ This sample demonstrates:
 - ✅ Proper target name extraction from file paths
 - ✅ Individual coverage calculation per target
 - ✅ Cross-target dependencies (UtilsLibrary uses CoreLibrary)
+- ✅ Cross-platform compatibility (iOS/macOS) with conditional compilation
+- ✅ Real-world Swift Testing scenarios with platform-specific code
 - ✅ Realistic partial coverage scenarios
