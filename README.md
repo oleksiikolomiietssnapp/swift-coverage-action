@@ -31,7 +31,7 @@ on:
 
 jobs:
   coverage:
-    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.0
+    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
 ```
 
 ### Advanced Usage
@@ -39,7 +39,7 @@ jobs:
 ```yaml
 jobs:
   coverage:
-    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.0
+    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
     with:
       xcode-version: "16.2"
       project-name-override: "MyCustomProject"
@@ -51,7 +51,7 @@ jobs:
 
 **Recommended (stable):**
 ```yaml
-uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.0
+uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
 ```
 
 **Latest (for testing):**
