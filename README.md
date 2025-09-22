@@ -1,6 +1,6 @@
 # Swift Coverage Action
 
-A reusable GitHub Actions workflow for generating Swift test coverage reports with PR comments.
+A reusable GitHub Actions workflow for generating **Swift Testing** coverage reports for **Swift Package Manager** packages with PR comments.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -75,9 +75,14 @@ uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-cover
 |--------|-------------|
 | `coverage-percentage` | The calculated coverage percentage |
 
-## Project Compatibility
+## What This Action Is For
 
-This workflow works with **Swift Package Manager packages** that support `swift test`:
+This workflow is specifically designed for:
+
+- **Swift Package Manager packages** using Swift Testing framework
+- **Packages with Apple framework dependencies** (requires macOS/Xcode)
+- **Multi-target packages** with individual coverage reporting
+- **Cross-platform Swift libraries** targeting Apple platforms
 
 ### ✅ Swift Package Manager Packages
 - Uses `{ProjectName}/Sources/` pattern automatically
@@ -118,10 +123,10 @@ with:
 
 ## Requirements
 
-- Swift Package Manager package with `Package.swift`
-- Package must support `swift test` command
-- **Swift Testing framework** (tested and verified)
-- macOS runner (uses Xcode)
+- **Swift Package Manager package** with `Package.swift`
+- **Swift Testing framework** for tests
+- **macOS runner** (requires Xcode for Apple framework support)
+- Package must support `swift test --enable-swift-testing --enable-code-coverage`
 
 ## Setup
 
