@@ -160,7 +160,8 @@ The workflow generates coverage tables with automatic target detection:
 This repository includes a complete [sample Swift Package](sample/) with multiple targets to demonstrate the action's multi-target capabilities. The sample shows realistic coverage scenarios with:
 
 - **CoreLibrary** - Core mathematical operations (high coverage)
-- **UtilsLibrary** - Utility functions with dependencies (partial coverage)
-- **Comprehensive tests** - Demonstrating real-world testing patterns
+- **UtilsLibrary** - Utility functions with UIKit/AppKit dependencies (partial coverage)
+- **Cross-platform code** - Demonstrates conditional compilation for iOS/macOS frameworks
+- **Comprehensive tests** - Real-world testing patterns with platform-specific APIs
 
 See the [sample README](sample/README.md) for details.
