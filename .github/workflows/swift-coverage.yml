@@ -3,11 +3,6 @@ name: Swift Test Coverage
 on:
   workflow_call:
     inputs:
-      xcode-version:
-        description: 'Xcode version to use'
-        required: false
-        type: string
-        default: '16.2'
       source-path-override:
         description: 'Override source path pattern (default: {PROJECT}/Sources)'
         required: false
@@ -32,7 +27,6 @@ on:
         value: ${{ jobs.coverage.outputs.coverage }}
 
 env:
-  XCODE_PATH: '/Applications/Xcode_${{ inputs.xcode-version }}.app/Contents/Developer'
   COVERAGE_SUMMARY_FILE: '${{ github.workspace }}/coverage_summary.txt'
 
 jobs:
@@ -51,11 +45,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: List Xcode installations
-      run: sudo ls -1 /Applications | grep "Xcode"
-
-    - name: Select Xcode ${{ inputs.xcode-version }}
-      run: sudo xcode-select -s ${{ env.XCODE_PATH }}
+    - name: Check Swift Version
+      run: |
+        echo "Using default Xcode/Swift version:"
+        swift --version
+        xcode-select -p
 
     - name: Run Swift Tests with Coverage
       run: |
