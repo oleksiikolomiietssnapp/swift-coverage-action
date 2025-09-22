@@ -77,43 +77,39 @@ uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-cover
 
 ## Project Compatibility
 
-This workflow works with **any Swift project** that uses `swift test`:
+This workflow works with **Swift Package Manager packages** that support `swift test`:
 
-### ✅ Swift Package Manager Projects (Default)
+### ✅ Swift Package Manager Packages
 - Uses `{ProjectName}/Sources/` pattern automatically
-- No configuration needed
+- Supports single and multi-target packages
+- No configuration needed for standard SPM structure
 
-### ✅ iOS/macOS App Projects
-- Override source path to your app target folder
-- Example: `source-path-override: "MyApp/MyApp"`
+### ✅ Custom SPM Package Structures
+- Override source path patterns if needed
+- Examples: `"Sources/Core"`, `"Modules/Feature"`, custom directories
 
-### ✅ Custom Project Structures
-- Any folder structure with configurable path patterns
-- Examples: `"Sources/Core"`, `"Modules/Feature"`, `"MyProject/Logic"`
+### Examples by Package Type
 
-### Examples by Project Type
-
-**Swift Package:**
+**Standard Swift Package:**
 ```yaml
 uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
 # Uses default: {ProjectName}/Sources/
 ```
 
-**iOS App:**
+**Multi-target Swift Package:**
 ```yaml
 uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
-with:
-  source-path-override: "MyApp/MyApp"
+# Automatically detects and reports each target separately
 ```
 
-**Multi-module project:**
+**Custom SPM structure:**
 ```yaml
 uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
 with:
   source-path-override: "Sources/Core"
 ```
 
-**Project in subdirectory:**
+**Package in subdirectory:**
 ```yaml
 uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
 with:
@@ -122,14 +118,15 @@ with:
 
 ## Requirements
 
-- Any Swift project that supports `swift test`
-- **Swift Testing framework** (works with latest version)
+- Swift Package Manager package with `Package.swift`
+- Package must support `swift test` command
+- **Swift Testing framework** (tested and verified)
 - macOS runner (uses Xcode)
 
 ## Setup
 
-1. Add the workflow to your Swift project's `.github/workflows/` directory
-2. Configure inputs as needed for your project structure
+1. Add the workflow to your Swift Package's `.github/workflows/` directory
+2. Configure inputs as needed for your package structure
 3. Push to trigger the workflow on your next PR or commit to main
 
 ## Contributing
