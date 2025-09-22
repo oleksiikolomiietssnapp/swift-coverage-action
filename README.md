@@ -95,27 +95,27 @@ This workflow works with **any Swift project** that uses `swift test`:
 
 **Swift Package:**
 ```yaml
-uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.0
+uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
 # Uses default: {ProjectName}/Sources/
 ```
 
 **iOS App:**
 ```yaml
-uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.0
+uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
 with:
   source-path-override: "MyApp/MyApp"
 ```
 
 **Multi-module project:**
 ```yaml
-uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.0
+uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
 with:
   source-path-override: "Sources/Core"
 ```
 
 **Project in subdirectory:**
 ```yaml
-uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.0
+uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
 with:
   working-directory: "./my-swift-package"
 ```
