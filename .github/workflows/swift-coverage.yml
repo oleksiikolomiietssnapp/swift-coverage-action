@@ -57,6 +57,9 @@ jobs:
     - name: Select Xcode ${{ inputs.xcode-version }}
       run: sudo xcode-select -s ${{ env.XCODE_PATH }}
 
+    - name: Verify Swift Version
+      run: swift --version
+
     - name: Run Swift Tests with Coverage
       run: |
         swift test --enable-swift-testing --enable-code-coverage
