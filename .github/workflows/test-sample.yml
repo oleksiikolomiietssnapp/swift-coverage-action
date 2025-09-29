@@ -3,10 +3,8 @@ name: Test Sample Multi-Target Package
 on:
   push:
     branches: [ "main" ]
-    paths: [ "sample/**" ]
   pull_request:
     branches: [ "main" ]
-    paths: [ "sample/**" ]
   workflow_dispatch: # Allow manual triggering
 
 jobs:
