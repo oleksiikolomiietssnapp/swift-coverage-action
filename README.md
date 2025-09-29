@@ -1,172 +1,59 @@
 # Swift Coverage Action
 
-A reusable GitHub Actions workflow for generating **Swift Testing** coverage reports for **Swift Package Manager** packages with PR comments.
+A GitHub Actions workflow for generating Swift Package Manager test coverage reports with PR comments.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://img.shields.io/github/actions/workflow/status/oleksiikolomiietssnapp/swift-coverage-action/test-sample.yml?branch=main&label=tests&logo=github)](https://github.com/oleksiikolomiietssnapp/swift-coverage-action/actions)
+[![Swift](https://img.shields.io/badge/Swift-6.1+-orange.svg?logo=swift)](https://swift.org)
+[![Xcode](https://img.shields.io/badge/Xcode-16.3+-blue.svg?logo=xcode)](https://developer.apple.com/xcode/)
+[![Platform](https://img.shields.io/badge/Platform-macOS-lightgrey.svg?logo=apple)](https://github.com/oleksiikolomiietssnapp/swift-coverage-action)
 
-## Features
-
-- 🧪 Runs Swift tests with coverage enabled using **Swift Testing** framework
-- 📊 Generates coverage reports in markdown table format with **multi-target support**
-- 💬 Automatically comments on pull requests with coverage data
-- 🎯 **Detects and reports coverage for each target separately** (Swift Package Manager)
-- 🔧 Configurable Xcode version, project name, source paths, and working directory
-- 📤 Outputs coverage percentage for use in other jobs
-- ✅ **Compatible with latest Swift Testing library**
-
-## Usage
-
-📋 **For a complete usage example, see [usage-example.yml](usage-example.yml)**
-
-### Basic Usage
+## Quick Start
 
 ```yaml
-name: Test and Coverage
-
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+name: Coverage
+on: [push, pull_request]
 
 jobs:
-  coverage:
-    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
+  test:
+    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main
 ```
 
-### Advanced Usage
+## Configuration
 
 ```yaml
 jobs:
-  coverage:
-    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
+  test:
+    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main
     with:
-      xcode-version: "16.2"
-      project-name-override: "MyCustomProject"
-      source-path-override: "MyProject/Sources"
-      coverage-comment-header: "### 📊 Test Coverage"
-```
-
-### Version Pinning
-
-**Recommended (stable):**
-```yaml
-uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
-```
-
-**Latest (for testing):**
-```yaml
-uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main
-```
-
-## Inputs
-
-| Input | Description | Required | Default |
-|-------|-------------|----------|---------|
-| `xcode-version` | Xcode version to use | No | `16.2` |
-| `source-path-override` | Override source path pattern for coverage filtering | No | `{PROJECT}/Sources` |
-| `project-name-override` | Override project name | No | Repository name |
-| `coverage-comment-header` | Header for coverage comment | No | `### 🛡️ Code Coverage Report` |
-| `working-directory` | Working directory for Swift commands | No | `.` (repository root) |
-
-## Outputs
-
-| Output | Description |
-|--------|-------------|
-| `coverage-percentage` | The calculated coverage percentage |
-
-## What This Action Is For
-
-This workflow is specifically designed for:
-
-- **Swift Package Manager packages** using Swift Testing framework
-- **Packages with Apple framework dependencies** (requires macOS/Xcode)
-- **Multi-target packages** with individual coverage reporting
-- **Cross-platform Swift libraries** targeting Apple platforms
-
-### ✅ Swift Package Manager Packages
-- Uses `{ProjectName}/Sources/` pattern automatically
-- Supports single and multi-target packages
-- No configuration needed for standard SPM structure
-
-### ✅ Custom SPM Package Structures
-- Override source path patterns if needed
-- Examples: `"Sources/Core"`, `"Modules/Feature"`, custom directories
-
-### Examples by Package Type
-
-**Standard Swift Package:**
-```yaml
-uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
-# Uses default: {ProjectName}/Sources/
-```
-
-**Multi-target Swift Package:**
-```yaml
-uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
-# Automatically detects and reports each target separately
-```
-
-**Custom SPM structure:**
-```yaml
-uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
-with:
-  source-path-override: "Sources/Core"
-```
-
-**Package in subdirectory:**
-```yaml
-uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.1
-with:
-  working-directory: "./my-swift-package"
+      xcode-version: "16.3"              # Optional, default: 16.3 (Swift 6.1)
+      project-name-override: "MyProject" # Optional, default: repo name
+      working-directory: "./my-package"  # Optional, default: root
 ```
 
 ## Requirements
 
-- **Swift Package Manager package** with `Package.swift`
-- **Swift Testing framework** for tests
-- **macOS runner** (requires Xcode for Apple framework support)
-- Package must support `swift test --enable-swift-testing --enable-code-coverage`
+- Swift Package Manager project with `Package.swift`
+- Swift Testing framework
+- macOS runner (needs Xcode)
+- Swift 6.1+ (included with Xcode 16.3+)
 
-## Setup
+## Output Example
 
-1. Add the workflow to your Swift Package's `.github/workflows/` directory
-2. Configure inputs as needed for your package structure
-3. Push to trigger the workflow on your next PR or commit to main
-
-## Contributing
-
-This is an open-source project. Feel free to:
-- Report issues
-- Submit feature requests
-- Contribute improvements via pull requests
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Example Output
-
-The workflow generates coverage tables with automatic target detection:
-
-### Single Target Project
-|   №  | Name | Executable Lines | Coverage |
-|:----:|------|-----------------:|---------:|
-| 1 | MyProject | 150 | **87.33%** |
-
-### Multi-Target Project (Swift Package Manager)
 |   №  | Name | Executable Lines | Coverage |
 |:----:|------|-----------------:|---------:|
 | 1 | CoreLibrary | 58 | **89.66%** |
 | 2 | UtilsLibrary | 77 | **49.35%** |
 
-## Sample Multi-Target Package
+## Inputs
 
-This repository includes a complete [sample Swift Package](sample/) with multiple targets to demonstrate the action's multi-target capabilities. The sample shows realistic coverage scenarios with:
+| Input | Default | Description |
+|-------|---------|-------------|
+| `xcode-version` | `16.3` | Xcode version (Swift 6.1+) |
+| `project-name-override` | repo name | Override project name |
+| `working-directory` | `.` | Package directory |
+| `coverage-comment-header` | `### 🛡️ Code Coverage Report` | PR comment header |
 
-- **CoreLibrary** - Core mathematical operations (high coverage)
-- **UtilsLibrary** - Utility functions with UIKit/AppKit dependencies (partial coverage)
-- **Cross-platform code** - Demonstrates conditional compilation for iOS/macOS frameworks
-- **Comprehensive tests** - Real-world testing patterns with platform-specific APIs
+## License
 
-See the [sample README](sample/README.md) for details.
+MIT License - see [LICENSE](LICENSE) file.
