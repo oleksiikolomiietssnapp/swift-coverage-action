@@ -1,12 +1,17 @@
 # Swift Coverage Action
 
+<div align="center">
+
 A GitHub Actions workflow for generating Swift Package Manager test coverage reports with PR comments.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://img.shields.io/github/actions/workflow/status/oleksiikolomiietssnapp/swift-coverage-action/test-sample.yml?branch=main&label=tests&logo=github)](https://github.com/oleksiikolomiietssnapp/swift-coverage-action/actions)
 [![Swift](https://img.shields.io/badge/Swift-6.1+-orange.svg?logo=swift)](https://swift.org)
 [![Xcode](https://img.shields.io/badge/Xcode-16.3+-blue.svg?logo=xcode)](https://developer.apple.com/xcode/)
+[![SPM](https://img.shields.io/badge/SPM-Compatible-brightgreen.svg?logo=swift)](https://swift.org/package-manager/)
 [![Platform](https://img.shields.io/badge/Platform-macOS-lightgrey.svg?logo=apple)](https://github.com/oleksiikolomiietssnapp/swift-coverage-action)
+
+</div>
 
 ## Quick Start
 
