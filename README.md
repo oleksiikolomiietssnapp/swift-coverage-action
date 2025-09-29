@@ -6,7 +6,7 @@ A GitHub Actions workflow for generating Swift Package Manager test coverage rep
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://img.shields.io/github/actions/workflow/status/oleksiikolomiietssnapp/swift-coverage-action/test-sample.yml?branch=main&label=tests&logo=github)](https://github.com/oleksiikolomiietssnapp/swift-coverage-action/actions)
-[![Swift](https://img.shields.io/badge/Swift-6.1+-orange.svg?logo=swift)](https://swift.org)
+[![Swift](https://img.shields.io/badge/Swift-6.1+(default)-orange.svg?logo=swift)](https://swift.org)
 [![Xcode](https://img.shields.io/badge/Xcode-16.3+-blue.svg?logo=xcode)](https://developer.apple.com/xcode/)
 [![SPM](https://img.shields.io/badge/SPM-Compatible-brightgreen.svg?logo=swift)](https://swift.org/package-manager/)
 [![Platform](https://img.shields.io/badge/Platform-macOS-lightgrey.svg?logo=apple)](https://github.com/oleksiikolomiietssnapp/swift-coverage-action)
@@ -38,10 +38,10 @@ jobs:
 
 ## Requirements
 
-- Swift Package Manager project with `Package.swift`
+- Swift Package with `Package.swift`
 - Swift Testing framework
 - macOS runner (needs Xcode)
-- Swift 6.1+ (included with Xcode 16.3+)
+- Swift version depends on Xcode version (default: Swift 6.1 with Xcode 16.3)
 
 ## Output Example
 
@@ -54,7 +54,7 @@ jobs:
 
 | Input | Default | Description |
 |-------|---------|-------------|
-| `xcode-version` | `16.3` | Xcode version (Swift 6.1+) |
+| `xcode-version` | `16.3` | Xcode version (determines Swift version) |
 | `project-name-override` | repo name | Override project name |
 | `working-directory` | `.` | Package directory |
 | `coverage-comment-header` | `### 🛡️ Code Coverage Report` | PR comment header |
