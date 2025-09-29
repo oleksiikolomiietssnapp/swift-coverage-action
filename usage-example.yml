@@ -16,7 +16,7 @@ jobs:
   coverage:
     uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.0
     with:
-      xcode-version: "16.2"
+      xcode-version: "16.3"
       # Optional: Override project name (defaults to repository name)
       # project-name-override: "MyCustomProject"
       # Optional: Override source path pattern

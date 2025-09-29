@@ -7,7 +7,7 @@ on:
         description: 'Xcode version to use'
         required: false
         type: string
-        default: '16.2'
+        default: '16.3'
       source-path-override:
         description: 'Override source path pattern (default: {PROJECT}/Sources)'
         required: false
@@ -56,6 +56,9 @@ jobs:
 
     - name: Select Xcode ${{ inputs.xcode-version }}
       run: sudo xcode-select -s ${{ env.XCODE_PATH }}
+
+    - name: Verify Swift Version
+      run: swift --version
 
     - name: Run Swift Tests with Coverage
       run: |
