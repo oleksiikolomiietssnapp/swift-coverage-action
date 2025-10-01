@@ -43,6 +43,8 @@ jobs:
 
 Add the `skip-coverage` label (or custom label via `skip-label` input) to your PR to skip workflow execution. For example, for documentation-only changes.
 
+**Note:** To re-enable the workflow after removing the label, push a new commit or close and reopen the PR. Manually re-running a skipped workflow will not work.
+
 ## Requirements
 
 - Swift Package with `Package.swift`
