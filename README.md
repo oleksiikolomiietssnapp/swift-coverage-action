@@ -36,7 +36,14 @@ jobs:
       xcode-version: "16.3"              # Optional, default: 16.3 (Swift 6.1)
       project-name-override: "MyProject" # Optional, default: repo name
       working-directory: "./my-package"  # Optional, default: root
+      skip-label: "skip-coverage"        # Optional, default: skip-coverage
 ```
+
+## Skipping Workflow
+
+Add the `skip-coverage` label (or custom label via `skip-label` input) to your PR to skip workflow execution. For example, for documentation-only changes.
+
+**Note:** To re-enable the workflow after removing the label, push a new commit or close and reopen the PR. Manually re-running a skipped workflow will not work.
 
 ## Requirements
 
@@ -60,6 +67,7 @@ jobs:
 | `project-name-override` | repo name | Override project name |
 | `working-directory` | `.` | Package directory |
 | `coverage-comment-header` | `### 🛡️ Code Coverage Report` | PR comment header |
+| `skip-label` | `skip-coverage` | PR label to skip workflow execution |
 
 ## License
 

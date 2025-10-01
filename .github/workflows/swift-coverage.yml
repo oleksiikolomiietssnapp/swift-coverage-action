@@ -26,6 +26,11 @@ on:
         required: false
         type: string
         default: '.'
+      skip-label:
+        description: 'Label name to skip workflow execution (default: skip-coverage)'
+        required: false
+        type: string
+        default: 'skip-coverage'
     outputs:
       coverage-percentage:
         description: 'The calculated coverage percentage'
@@ -37,6 +42,7 @@ env:
 
 jobs:
   coverage:
+    if: ${{ !contains(github.event.pull_request.labels.*.name, inputs.skip-label) }}
     runs-on: macos-latest
     permissions:
       contents: read
