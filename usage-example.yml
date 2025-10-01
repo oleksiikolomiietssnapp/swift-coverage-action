@@ -22,7 +22,7 @@ jobs:
       # Optional: Override source path pattern
       # source-path-override: "MyProject/Sources"
       # Optional: Customize coverage comment header
-      # coverage-comment-header: "### 📊 Test Coverage"
+      # coverage-comment-header: "### 📊 Test Coverage "
       # Optional: Label to skip workflow (defaults to "skip-coverage")
       # skip-label: "skip-coverage"
 
