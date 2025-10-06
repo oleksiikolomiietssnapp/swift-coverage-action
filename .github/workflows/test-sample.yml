@@ -8,7 +8,8 @@ on:
   workflow_dispatch: # Allow manual triggering
 
 jobs:
-  coverage:
+  coverage-default:
+    name: "Coverage (default: macOS latest, Xcode system)"
     permissions:
       contents: read
       pull-requests: write
@@ -16,5 +17,31 @@ jobs:
     uses: ./.github/workflows/swift-coverage.yml
     with:
       project-name-override: "SampleMultiTarget"
-      coverage-comment-header: "### 📊 Sample Multi-Target Coverage Report"
+      coverage-comment-header: "### 📊 Sample Multi-Target Coverage Report (macOS latest, Xcode system)"
+      working-directory: "./sample"
+
+  coverage-macos-26:
+    name: "Coverage (macOS 26, Xcode system)"
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    uses: ./.github/workflows/swift-coverage.yml
+    with:
+      macos-version: "26"
+      project-name-override: "SampleMultiTarget"
+      coverage-comment-header: "### 📊 Sample Multi-Target Coverage Report (macOS 26, Xcode system)"
+      working-directory: "./sample"
+
+  coverage-xcode-16-3:
+    name: "Coverage (macOS latest, Xcode 16.3)"
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    uses: ./.github/workflows/swift-coverage.yml
+    with:
+      xcode-version: "16.3"
+      project-name-override: "SampleMultiTarget"
+      coverage-comment-header: "### 📊 Sample Multi-Target Coverage Report (macOS latest, Xcode 16.3)"
       working-directory: "./sample"
