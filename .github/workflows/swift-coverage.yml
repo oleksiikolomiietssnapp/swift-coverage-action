@@ -232,6 +232,12 @@ jobs:
         echo "📦 Checking for downloaded assets:"
         find ~/Library/LanguageModeling -type f 2>/dev/null | wc -l | xargs -I {} echo "{} files found"
 
+        echo "🗂️  Contents of en-dynamic.lm:"
+        ls -lah ~/Library/LanguageModeling/en-dynamic.lm/ 2>/dev/null || echo "Not accessible"
+
+        echo "🔬 Deep search for model assets:"
+        find ~/Library/LanguageModeling -type f -name "*.bin" -o -name "*.mlmodelc" -o -name "*.bundle" 2>/dev/null || echo "No binary model files found"
+
     - name: AI Coverage Analysis
       id: ai_analysis
       run: |
