@@ -40,6 +40,9 @@ on:
       coverage-percentage:
         description: 'The calculated coverage percentage'
         value: ${{ jobs.coverage.outputs.coverage }}
+      coverage-table:
+        description: 'The coverage table in markdown format'
+        value: ${{ jobs.coverage.outputs.coverage-table }}
 
 env:
   XCODE_PATH: '/Applications/Xcode_${{ inputs.xcode-version }}.app/Contents/Developer'
@@ -55,6 +58,7 @@ jobs:
       issues: write
     outputs:
       coverage: ${{ steps.extract.outputs.coverage }}
+      coverage-table: ${{ steps.extract.outputs.coverage-table }}
     defaults:
       run:
         working-directory: ${{ inputs.working-directory }}
@@ -212,6 +216,11 @@ jobs:
 
         # Output for next steps
         echo "coverage=$average_coverage_rounded" >> $GITHUB_OUTPUT
+
+        # Output table for combined comments
+        echo "coverage-table<<EOF" >> $GITHUB_OUTPUT
+        cat ${{ env.COVERAGE_SUMMARY_FILE }} >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
 
     - name: Comment on Pull Request
       if: github.event_name == 'pull_request'
