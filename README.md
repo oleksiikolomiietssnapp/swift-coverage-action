@@ -41,13 +41,16 @@ jobs:
       issues: write
     uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main
     with:
-      macos-version: "latest"            # Optional, default: latest (also: "15", "14")
-      xcode-version: "16.4"              # Optional, default: system default
-      project-name-override: "MyProject" # Optional, default: repo name
-      working-directory: "./my-package"  # Optional, default: root
-      skip-label: "skip-coverage"        # Optional, default: skip-coverage
-      post-comment: true                 # Optional, default: true (set false for combined comments)
+      macos-version: "latest"            # Optional: "latest", "26", "15", "14"
+      xcode-version: "16.4"              # Optional: specific version or system default
+      project-name-override: "MyProject" # Optional: defaults to repo name
+      working-directory: "./my-package"  # Optional: defaults to root
+      skip-label: "skip-coverage"        # Optional: PR label to skip execution
+      post-comment: true                 # Optional: false for multi-job combined comments
+      job-name: "Configuration Name"     # Optional: used in combined comments
 ```
+
+See [sample workflows](.github/workflows) for single and multi-job examples.
 
 ## Skipping Workflow
 

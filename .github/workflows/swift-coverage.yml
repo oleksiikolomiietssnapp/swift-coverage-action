@@ -3,6 +3,7 @@ name: Swift Test Coverage
 on:
   workflow_call:
     inputs:
+      # Basic configuration
       macos-version:
         description: 'macOS runner version (e.g., "latest", "15", "14")'
         required: false
@@ -36,6 +37,8 @@ on:
         required: false
         type: string
         default: 'skip-coverage'
+
+      # Multi-job combined comments
       post-comment:
         description: 'Post coverage comment to PR (set to false when using combined comments)'
         required: false
@@ -45,11 +48,14 @@ on:
         description: 'Name/description for this coverage job (used in combined reports)'
         required: false
         type: string
-        default: 'Coverage'
+        default: ''
+
     outputs:
       coverage-percentage:
         description: 'The calculated coverage percentage'
         value: ${{ jobs.coverage.outputs.coverage }}
+
+      # Multi-job combined comments
       coverage-table:
         description: 'The coverage table in markdown format'
         value: ${{ jobs.coverage.outputs.coverage-table }}

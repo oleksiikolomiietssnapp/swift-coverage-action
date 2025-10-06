@@ -17,4 +17,5 @@ jobs:
     with:
       project-name-override: "SampleMultiTarget"
       working-directory: "./sample"
-      coverage-comment-header: "### 📊 Sample Coverage Report"
+      coverage-comment-header: "### 📊 Sample Coverage Report (Single Job)"
+      post-comment: true  # Default behavior - posts individual PR comment

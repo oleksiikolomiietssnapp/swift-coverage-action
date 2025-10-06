@@ -22,18 +22,19 @@ The tests are intentionally **incomplete** to demonstrate partial coverage:
 - **CoreLibrary**: ~90% coverage (most functions tested)
 - **UtilsLibrary**: ~65% coverage (some functions not tested, demonstrates mixed coverage)
 
-## Expected Coverage Report
+## Test Workflows
 
-When the action runs, you should see output like:
+This sample has two test workflows demonstrating different usage patterns:
 
-```
-### 📊 Sample Multi-Target Coverage
+### Single Job ([test-sample-single.yml](../.github/workflows/test-sample-single.yml))
+- Runs one coverage job
+- Automatically posts PR comment with coverage table
+- Simplest setup for most projects
 
-|   №  | Name | Executable Lines | Coverage |
-|:----:|------|-----------------:|---------:|
-| 1 | CoreLibrary | 58 | **89.66%** |
-| 2 | UtilsLibrary | 77 | **49.35%** |
-```
+### Combined Multi-Config ([test-sample-combined.yml](../.github/workflows/test-sample-combined.yml))
+- Runs multiple jobs (different macOS/Xcode versions)
+- Combines results into one PR comment with separate sections
+- Demonstrates advanced multi-configuration testing
 
 ## Running Tests
 
