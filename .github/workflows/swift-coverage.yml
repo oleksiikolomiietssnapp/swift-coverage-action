@@ -208,113 +208,6 @@ jobs:
         # Output for next steps
         echo "coverage=$average_coverage_rounded" >> $GITHUB_OUTPUT
 
-    - name: Enable Apple Intelligence
-      run: |
-        echo "📱 Checking Apple Intelligence status..."
-        defaults read com.apple.CloudSubscriptionFeatures.optIn "545129924" 2>/dev/null || echo "Apple Intelligence not currently enabled"
-
-        echo "📝 Enabling Apple Intelligence..."
-        defaults write com.apple.CloudSubscriptionFeatures.optIn "545129924" -bool "true"
-
-        echo "✅ Verifying setting..."
-        defaults read com.apple.CloudSubscriptionFeatures.optIn "545129924"
-
-        echo "⏳ Waiting for model assets to download (10s)..."
-        sleep 10
-        echo "⏱️  10s elapsed..."
-
-        echo "🔍 Checking for model files..."
-        find ~/Library -name "*FoundationModels*" -o -name "*LanguageModel*" 2>/dev/null | head -5 || echo "No model files found"
-
-        echo "📂 Contents of LanguageModeling directory:"
-        ls -lah ~/Library/LanguageModeling 2>/dev/null || echo "Directory not accessible"
-
-        echo "📦 Checking for downloaded assets:"
-        find ~/Library/LanguageModeling -type f 2>/dev/null | wc -l | xargs -I {} echo "{} files found"
-
-        echo "🗂️  Contents of en-dynamic.lm:"
-        ls -lah ~/Library/LanguageModeling/en-dynamic.lm/ 2>/dev/null || echo "Not accessible"
-
-        echo "🔬 Deep search for model assets:"
-        find ~/Library/LanguageModeling -type f -name "*.bin" -o -name "*.mlmodelc" -o -name "*.bundle" 2>/dev/null || echo "No binary model files found"
-
-    - name: AI Coverage Analysis
-      id: ai_analysis
-      run: |
-        echo "🤖 Starting AI Coverage Analysis..."
-        echo "Coverage value: ${{ steps.extract.outputs.coverage }}%"
-
-        cat > /tmp/analyze-coverage.swift << 'SWIFT_EOF'
-        import Foundation
-
-        #if canImport(FoundationModels)
-        import FoundationModels
-
-        print("✅ FoundationModels framework is available", to: &standardError)
-
-        guard CommandLine.arguments.count > 1,
-              let coverage = Double(CommandLine.arguments[1]) else {
-            print("❌ No coverage value provided", to: &standardError)
-            print("No AI analysis available")
-            exit(0)
-        }
-
-        print("📊 Coverage value received: \(coverage)%", to: &standardError)
-
-        let prompt = """
-        The code test coverage is \(String(format: "%.2f", coverage))%.
-        Provide a brief assessment (1-2 sentences) of this coverage percentage.
-        Focus on whether it's good, acceptable, or needs improvement.
-        """
-
-        print("📝 Checking model availability...", to: &standardError)
-        let availability = SystemLanguageModel.default.availability
-        print("Model availability status: \(availability)", to: &standardError)
-
-        do {
-            print("🚀 Creating LanguageModelSession...", to: &standardError)
-            let session = LanguageModelSession()
-            print("💬 Sending prompt to model...", to: &standardError)
-            let response = try await session.respond(to: prompt)
-            print("✅ Response received successfully", to: &standardError)
-            print(response.content)
-        } catch {
-            print("❌ Error during AI analysis: \(error)", to: &standardError)
-            print("AI analysis unavailable: \(error.localizedDescription)")
-        }
-        #else
-        print("❌ FoundationModels framework is NOT available", to: &standardError)
-        print("AI analysis requires macOS 26+")
-        #endif
-
-        var standardError = FileHandle.standardError
-
-        extension FileHandle: TextOutputStream {
-            public func write(_ string: String) {
-                guard let data = string.data(using: .utf8) else { return }
-                self.write(data)
-            }
-        }
-        SWIFT_EOF
-
-        echo "🔧 Compiling and running Swift script..."
-        AI_ASSESSMENT=$(swift /tmp/analyze-coverage.swift "${{ steps.extract.outputs.coverage }}" 2>&1)
-        echo "📤 AI Assessment output:"
-        echo "$AI_ASSESSMENT"
-
-        # Extract only the actual assessment (last line that's not debug info)
-        CLEAN_ASSESSMENT=$(echo "$AI_ASSESSMENT" | grep -v "^✅\|^❌\|^📊\|^📝\|^🚀\|^💬\|^Model availability" | tail -1)
-
-        if [ -n "$CLEAN_ASSESSMENT" ] && [ "$CLEAN_ASSESSMENT" != "AI analysis requires macOS 26+" ] && [ "$CLEAN_ASSESSMENT" != "No AI analysis available" ]; then
-          echo "💾 Saving AI assessment to output..."
-          echo "ai_assessment<<EOF" >> $GITHUB_OUTPUT
-          echo "$CLEAN_ASSESSMENT" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-        else
-          echo "⚠️ No valid AI assessment generated"
-        fi
-        rm -f /tmp/analyze-coverage.swift
-
     - name: Comment on Pull Request
       if: github.event_name == 'pull_request'
       uses: actions/github-script@v7
@@ -322,18 +215,12 @@ jobs:
         script: |
           const fs = require('fs');
           const coverageOutput = fs.readFileSync('${{ env.COVERAGE_SUMMARY_FILE }}', 'utf8');
-          const aiAssessment = `${{ steps.ai_analysis.outputs.ai_assessment }}`;
-
-          let aiSection = '';
-          if (aiAssessment && aiAssessment.trim()) {
-            aiSection = `\n### 🤖 AI Assessment\n${aiAssessment}\n`;
-          }
 
           const newComment = `
           ${{ inputs.coverage-comment-header }}
 
           ${coverageOutput}
-          ${aiSection}
+
           _Generated by [Swift Coverage Action](https://github.com/oleksiikolomiietssnapp/swift-coverage-action)._
           `;
 
