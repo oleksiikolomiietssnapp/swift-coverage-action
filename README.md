@@ -10,8 +10,8 @@ A GitHub Actions workflow for generating Swift Package Manager test coverage rep
 [![SPM](https://img.shields.io/badge/SPM-Compatible-brightgreen.svg?logo=swift)](https://swift.org/package-manager/)
 [![Platform](https://img.shields.io/badge/Platform-macOS-lightgrey.svg?logo=apple)](https://github.com/oleksiikolomiietssnapp/swift-coverage-action)
 
-[![Xcode](https://img.shields.io/badge/Xcode-Configurable_(default:_16.3)-blue.svg?logo=xcode)](https://developer.apple.com/xcode/)
-[![Swift](https://img.shields.io/badge/Swift-Configurable_(default:_6.1)-orange.svg?logo=swift)](https://swift.org)
+[![macOS](https://img.shields.io/badge/macOS-Configurable_(default:_latest)-blue.svg?logo=apple)](https://github.com/actions/runner-images)
+[![Xcode](https://img.shields.io/badge/Xcode-Configurable_(default:_system)-blue.svg?logo=xcode)](https://developer.apple.com/xcode/)
 
 </div>
 
@@ -23,6 +23,10 @@ on: [push, pull_request]
 
 jobs:
   test:
+    permissions:
+      contents: read
+      pull-requests: write  # Required for PR comments
+      issues: write         # Required for PR comments
     uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main
 ```
 
@@ -31,12 +35,18 @@ jobs:
 ```yaml
 jobs:
   test:
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
     uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main
     with:
-      xcode-version: "16.3"              # Optional, default: 16.3 (Swift 6.1)
+      macos-version: "latest"            # Optional, default: latest (also: "15", "14")
+      xcode-version: "16.4"              # Optional, default: system default
       project-name-override: "MyProject" # Optional, default: repo name
       working-directory: "./my-package"  # Optional, default: root
       skip-label: "skip-coverage"        # Optional, default: skip-coverage
+      post-comment: true                 # Optional, default: true (set false for combined comments)
 ```
 
 ## Skipping Workflow
@@ -49,8 +59,8 @@ Add the `skip-coverage` label (or custom label via `skip-label` input) to your P
 
 - Swift Package with `Package.swift`
 - Swift Testing framework
-- macOS runner (needs Xcode)
-- Swift version depends on Xcode version (default: Swift 6.1 with Xcode 16.3)
+- macOS runner (configurable, default: latest)
+- Xcode (uses system default or specify version)
 
 ## Output Example
 
@@ -63,11 +73,20 @@ Add the `skip-coverage` label (or custom label via `skip-label` input) to your P
 
 | Input | Default | Description |
 |-------|---------|-------------|
-| `xcode-version` | `16.3` | Xcode version (determines Swift version) |
+| `macos-version` | `latest` | macOS runner version (`latest`, `15`, `14`, etc.) |
+| `xcode-version` | system default | Xcode version (e.g., `16.4`, `15.2`) |
 | `project-name-override` | repo name | Override project name |
 | `working-directory` | `.` | Package directory |
 | `coverage-comment-header` | `### 🛡️ Code Coverage Report` | PR comment header |
 | `skip-label` | `skip-coverage` | PR label to skip workflow execution |
+| `post-comment` | `true` | Post coverage comment (set `false` for combined comments) |
+
+## Permissions
+
+When using this workflow, you need to grant the following permissions:
+- `contents: read` - Required to checkout code
+- `pull-requests: write` - Required to post PR comments (only if `post-comment: true`)
+- `issues: write` - Required to post PR comments (only if `post-comment: true`)
 
 ## License
 
