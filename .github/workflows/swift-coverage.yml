@@ -36,6 +36,11 @@ on:
         required: false
         type: string
         default: 'skip-coverage'
+      post-comment:
+        description: 'Post coverage comment to PR (set to false when using combined comments)'
+        required: false
+        type: boolean
+        default: true
     outputs:
       coverage-percentage:
         description: 'The calculated coverage percentage'
@@ -54,8 +59,8 @@ jobs:
     runs-on: macos-${{ inputs.macos-version }}
     permissions:
       contents: read
-      pull-requests: write
-      issues: write
+      pull-requests: ${{ inputs.post-comment && 'write' || 'none' }}
+      issues: ${{ inputs.post-comment && 'write' || 'none' }}
     outputs:
       coverage: ${{ steps.extract.outputs.coverage }}
       coverage-table: ${{ steps.extract.outputs.coverage-table }}
@@ -223,7 +228,7 @@ jobs:
         echo "EOF" >> $GITHUB_OUTPUT
 
     - name: Comment on Pull Request
-      if: github.event_name == 'pull_request'
+      if: github.event_name == 'pull_request' && inputs.post-comment
       uses: actions/github-script@v7
       with:
         script: |
