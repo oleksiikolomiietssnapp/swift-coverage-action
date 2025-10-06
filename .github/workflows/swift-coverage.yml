@@ -4,10 +4,10 @@ on:
   workflow_call:
     inputs:
       xcode-version:
-        description: 'Xcode version to use'
+        description: 'Xcode version to use (default: system default)'
         required: false
         type: string
-        default: '16.3'
+        default: ''
       source-path-override:
         description: 'Override source path pattern (default: {PROJECT}/Sources)'
         required: false
@@ -61,6 +61,7 @@ jobs:
       run: sudo ls -1 /Applications | grep "Xcode"
 
     - name: Select Xcode ${{ inputs.xcode-version }}
+      if: inputs.xcode-version != ''
       run: sudo xcode-select -s ${{ env.XCODE_PATH }}
 
     - name: Verify Swift Version
