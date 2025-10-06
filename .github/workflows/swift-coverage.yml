@@ -3,6 +3,11 @@ name: Swift Test Coverage
 on:
   workflow_call:
     inputs:
+      macos-version:
+        description: 'macOS runner version (e.g., "latest", "15", "14")'
+        required: false
+        type: string
+        default: 'latest'
       xcode-version:
         description: 'Xcode version to use (default: system default)'
         required: false
@@ -43,7 +48,7 @@ env:
 jobs:
   coverage:
     if: ${{ !contains(github.event.pull_request.labels.*.name, inputs.skip-label) }}
-    runs-on: macos-26
+    runs-on: macos-${{ inputs.macos-version }}
     permissions:
       contents: read
       pull-requests: write
