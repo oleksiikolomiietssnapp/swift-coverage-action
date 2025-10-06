@@ -57,10 +57,6 @@ jobs:
   coverage:
     if: ${{ !contains(github.event.pull_request.labels.*.name, inputs.skip-label) }}
     runs-on: macos-${{ inputs.macos-version }}
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
     outputs:
       coverage: ${{ steps.extract.outputs.coverage }}
       coverage-table: ${{ steps.extract.outputs.coverage-table }}
