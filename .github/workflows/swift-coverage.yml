@@ -41,6 +41,11 @@ on:
         required: false
         type: boolean
         default: true
+      job-name:
+        description: 'Name/description for this coverage job (used in combined reports)'
+        required: false
+        type: string
+        default: 'Coverage'
     outputs:
       coverage-percentage:
         description: 'The calculated coverage percentage'
@@ -48,6 +53,9 @@ on:
       coverage-table:
         description: 'The coverage table in markdown format'
         value: ${{ jobs.coverage.outputs.coverage-table }}
+      job-name:
+        description: 'The job name for this coverage run'
+        value: ${{ inputs.job-name }}
 
 env:
   XCODE_PATH: '/Applications/Xcode_${{ inputs.xcode-version }}.app/Contents/Developer'
