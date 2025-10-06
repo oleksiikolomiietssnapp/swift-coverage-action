@@ -219,8 +219,14 @@ jobs:
         echo "✅ Verifying setting..."
         defaults read com.apple.CloudSubscriptionFeatures.optIn "545129924"
 
-        echo "⏳ Waiting for setting to take effect..."
-        sleep 2
+        echo "⏳ Waiting for model assets to download (60s)..."
+        for i in {1..12}; do
+          echo "⏱️  ${i}0s elapsed..."
+          sleep 10
+        done
+
+        echo "🔍 Checking for model files..."
+        find ~/Library -name "*FoundationModels*" -o -name "*LanguageModel*" 2>/dev/null | head -5 || echo "No model files found"
 
     - name: AI Coverage Analysis
       id: ai_analysis
