@@ -1,4 +1,4 @@
-name: Test Sample Multi-Target Package
+name: Test Sample (Single Job)
 
 on:
   push:
@@ -16,5 +16,6 @@ jobs:
     uses: ./.github/workflows/swift-coverage.yml
     with:
       project-name-override: "SampleMultiTarget"
-      coverage-comment-header: "### 📊 Sample Multi-Target Coverage Report"
       working-directory: "./sample"
+      coverage-comment-header: "### 📊 Sample Coverage Report"
+      post-comment: true  # Default behavior - posts individual PR comment
