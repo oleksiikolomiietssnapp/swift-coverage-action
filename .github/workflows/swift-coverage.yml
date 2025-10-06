@@ -219,14 +219,18 @@ jobs:
         echo "✅ Verifying setting..."
         defaults read com.apple.CloudSubscriptionFeatures.optIn "545129924"
 
-        echo "⏳ Waiting for model assets to download (60s)..."
-        for i in {1..12}; do
-          echo "⏱️  ${i}0s elapsed..."
-          sleep 10
-        done
+        echo "⏳ Waiting for model assets to download (10s)..."
+        sleep 10
+        echo "⏱️  10s elapsed..."
 
         echo "🔍 Checking for model files..."
         find ~/Library -name "*FoundationModels*" -o -name "*LanguageModel*" 2>/dev/null | head -5 || echo "No model files found"
+
+        echo "📂 Contents of LanguageModeling directory:"
+        ls -lah ~/Library/LanguageModeling 2>/dev/null || echo "Directory not accessible"
+
+        echo "📦 Checking for downloaded assets:"
+        find ~/Library/LanguageModeling -type f 2>/dev/null | wc -l | xargs -I {} echo "{} files found"
 
     - name: AI Coverage Analysis
       id: ai_analysis
