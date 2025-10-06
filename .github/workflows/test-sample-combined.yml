@@ -1,4 +1,4 @@
-name: Test Sample Multi-Target Package
+name: Test Sample (Combined Multi-Config)
 
 on:
   push:
@@ -17,30 +17,30 @@ jobs:
       post-comment: false
       job-name: "macOS latest + Xcode system"
 
-  # coverage-macos-26:
-  #   name: "Coverage (macOS 26, Xcode system)"
-  #   uses: ./.github/workflows/swift-coverage.yml
-  #   with:
-  #     macos-version: "26"
-  #     project-name-override: "SampleMultiTarget"
-  #     working-directory: "./sample"
-  #     post-comment: false
-  #     job-name: "macOS 26 + Xcode system"
+  coverage-macos-26:
+    name: "Coverage (macOS 26, Xcode system)"
+    uses: ./.github/workflows/swift-coverage.yml
+    with:
+      macos-version: "26"
+      project-name-override: "SampleMultiTarget"
+      working-directory: "./sample"
+      post-comment: false
+      job-name: "macOS 26 + Xcode system"
 
-  # coverage-xcode-16-3:
-  #   name: "Coverage (macOS latest, Xcode 16.3)"
-  #   uses: ./.github/workflows/swift-coverage.yml
-  #   with:
-  #     xcode-version: "16.3"
-  #     project-name-override: "SampleMultiTarget"
-  #     working-directory: "./sample"
-  #     post-comment: false
-  #     job-name: "macOS latest + Xcode 16.3"
+  coverage-xcode-16-3:
+    name: "Coverage (macOS latest, Xcode 16.3)"
+    uses: ./.github/workflows/swift-coverage.yml
+    with:
+      xcode-version: "16.3"
+      project-name-override: "SampleMultiTarget"
+      working-directory: "./sample"
+      post-comment: false
+      job-name: "macOS latest + Xcode 16.3"
 
   post-coverage-comment:
     name: "Post Combined Coverage Comment"
     if: github.event_name == 'pull_request'
-    needs: [coverage-default]
+    needs: [coverage-default, coverage-macos-26, coverage-xcode-16-3]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
