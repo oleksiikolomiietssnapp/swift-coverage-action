@@ -12,6 +12,8 @@ jobs:
     name: "Coverage (default: macOS latest, Xcode system)"
     permissions:
       contents: read
+      pull-requests: none
+      issues: none
     uses: ./.github/workflows/swift-coverage.yml
     with:
       project-name-override: "SampleMultiTarget"
@@ -22,6 +24,8 @@ jobs:
     name: "Coverage (macOS 26, Xcode system)"
     permissions:
       contents: read
+      pull-requests: none
+      issues: none
     uses: ./.github/workflows/swift-coverage.yml
     with:
       macos-version: "26"
@@ -33,6 +37,8 @@ jobs:
     name: "Coverage (macOS latest, Xcode 16.3)"
     permissions:
       contents: read
+      pull-requests: none
+      issues: none
     uses: ./.github/workflows/swift-coverage.yml
     with:
       xcode-version: "16.3"
