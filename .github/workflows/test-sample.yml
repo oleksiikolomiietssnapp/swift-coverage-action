@@ -45,27 +45,27 @@ jobs:
       jobs-json: ${{ steps.prepare.outputs.jobs-json }}
     steps:
       - id: prepare
-        run: |
-          JOBS_JSON='[
-            {
-              "name": "${{ needs.coverage-default.outputs.job-name }}",
-              "coverage": "${{ needs.coverage-default.outputs.coverage-percentage }}",
-              "table": ${{ toJSON(needs.coverage-default.outputs.coverage-table) }}
-            },
-            {
-              "name": "${{ needs.coverage-macos-26.outputs.job-name }}",
-              "coverage": "${{ needs.coverage-macos-26.outputs.coverage-percentage }}",
-              "table": ${{ toJSON(needs.coverage-macos-26.outputs.coverage-table) }}
-            },
-            {
-              "name": "${{ needs.coverage-xcode-16-3.outputs.job-name }}",
-              "coverage": "${{ needs.coverage-xcode-16-3.outputs.coverage-percentage }}",
-              "table": ${{ toJSON(needs.coverage-xcode-16-3.outputs.coverage-table) }}
-            }
-          ]'
-          echo "jobs-json<<EOF" >> $GITHUB_OUTPUT
-          echo "$JOBS_JSON" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const jobs = [
+              {
+                name: '${{ needs.coverage-default.outputs.job-name }}',
+                coverage: '${{ needs.coverage-default.outputs.coverage-percentage }}',
+                table: ${{ toJSON(needs.coverage-default.outputs.coverage-table) }}
+              },
+              {
+                name: '${{ needs.coverage-macos-26.outputs.job-name }}',
+                coverage: '${{ needs.coverage-macos-26.outputs.coverage-percentage }}',
+                table: ${{ toJSON(needs.coverage-macos-26.outputs.coverage-table) }}
+              },
+              {
+                name: '${{ needs.coverage-xcode-16-3.outputs.job-name }}',
+                coverage: '${{ needs.coverage-xcode-16-3.outputs.coverage-percentage }}',
+                table: ${{ toJSON(needs.coverage-xcode-16-3.outputs.coverage-table) }}
+              }
+            ];
+            core.setOutput('jobs-json', JSON.stringify(jobs));
 
   post-coverage-comment:
     name: "Post Combined Coverage Comment"
