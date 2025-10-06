@@ -208,6 +208,12 @@ jobs:
         # Output for next steps
         echo "coverage=$average_coverage_rounded" >> $GITHUB_OUTPUT
 
+    - name: Enable Apple Intelligence
+      run: |
+        defaults write com.apple.CloudSubscriptionFeatures.optIn "545129924" -bool "true"
+        # Wait a moment for the setting to take effect
+        sleep 2
+
     - name: AI Coverage Analysis
       id: ai_analysis
       run: |
