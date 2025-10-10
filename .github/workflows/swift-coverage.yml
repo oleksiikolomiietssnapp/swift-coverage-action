@@ -55,7 +55,7 @@ on:
         description: 'Show quality indicators (emoji) in coverage report'
         required: false
         type: boolean
-        default: true
+        default: false
       coverage-threshold-low:
         description: 'Coverage below this is marked as low (red)'
         required: false
