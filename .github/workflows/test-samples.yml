@@ -22,7 +22,7 @@ on:
 
 jobs:
   test-single:
-    if: ${{ workflow_dispatch.inputs.run-single }}
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run-single }}
     uses: ./.github/workflows/test-sample-single.yml
     permissions:
       contents: read
@@ -30,7 +30,7 @@ jobs:
       issues: write
 
   test-matrix:
-    if: ${{ inputs.run-matrix }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run-matrix }}
     uses: ./.github/workflows/test-sample-matrix.yml
     permissions:
       contents: read
@@ -38,7 +38,7 @@ jobs:
       issues: write
 
   test-multiple:
-    if: ${{ inputs.run-multiple }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run-multiple }}
     uses: ./.github/workflows/test-sample-combined.yml
     permissions:
       contents: read
