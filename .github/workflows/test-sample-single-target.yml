@@ -1,0 +1,21 @@
+name: Test Sample (Single Target)
+
+on:
+  workflow_call:
+
+jobs:
+  coverage-core:
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    uses: ./.github/workflows/swift-coverage.yml
+    with:
+      macos-version: "latest"
+      xcode-version: ""
+      project-name-override: "CoreLibrary"
+      working-directory: "./sample"
+      coverage-comment-header: "### 📊 CoreLibrary Coverage"
+      post-comment: true
+      coverage-threshold: "80"
+      fail-on-low-coverage: true
