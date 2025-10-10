@@ -1,16 +1,17 @@
 # Single Target Sample
 
-A minimal Swift Package with a single target to demonstrate basic coverage reporting.
+Minimal Swift Package with one target to demonstrate coverage reporting for simple projects.
 
 ## Structure
 
-- **MyLibrary** - Simple math utilities
-  - `Math.swift` - Basic arithmetic operations
+- **MyLibrary** - Math utilities (`add`, `multiply`, `divide`)
+- **MyLibraryTests** - Partial test coverage (~70%)
 
-## Coverage
+## Purpose
 
-Tests are intentionally incomplete (~70% coverage) to demonstrate threshold behavior.
+Demonstrates:
+- Single target coverage (no Total row in output)
+- Threshold behavior with `coverage-threshold: "70"`
+- Simple package structure
 
-## Usage
-
-This sample is used by `.github/workflows/test-sample-single-target.yml` to test coverage reporting for packages with a single target.
+Used by `.github/workflows/test-sample-single-target.yml`.

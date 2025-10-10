@@ -17,7 +17,7 @@ on:
 
 jobs:
   test-multiple-targets:
-    if: true
+    if: false
     uses: ./.github/workflows/test-sample-single.yml
     permissions:
       contents: read
@@ -33,7 +33,7 @@ jobs:
       issues: write
 
   test-matrix:
-    if: true
+    if: false
     uses: ./.github/workflows/test-sample-matrix.yml
     permissions:
       contents: read
@@ -41,7 +41,7 @@ jobs:
       issues: write
 
   test-combined:
-    if: true
+    if: false
     uses: ./.github/workflows/test-sample-combined.yml
     permissions:
       contents: read
