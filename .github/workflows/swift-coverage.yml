@@ -223,6 +223,7 @@ jobs:
         target_counter=1
         total_coverage_sum=0
         target_count=0
+        total_lines_sum=0
 
         if [ -s "$AGGREGATED_DATA" ]; then
           # Process each target and add to table
@@ -256,6 +257,7 @@ jobs:
 
               # For overall average calculation
               echo "$target_coverage" >> /tmp/coverage_values.txt
+              total_lines_sum=$((total_lines_sum + total_lines))
               target_counter=$((target_counter + 1))
 
             fi
@@ -290,7 +292,6 @@ jobs:
 
         # Add average/combined coverage row if multiple targets
         if [ $target_count -gt 1 ]; then
-          echo "" >> ${{ env.COVERAGE_SUMMARY_FILE }}
           if [ "$show_quality" = "true" ]; then
             # Determine quality indicator for average
             coverage_int=$(echo "$average_coverage_rounded" | awk '{print int($1)}')
@@ -299,9 +300,9 @@ jobs:
             else
               avg_indicator="🟢"
             fi
-            echo "**Average Coverage: ${average_coverage_rounded}%** ${avg_indicator}" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+            echo "| | **Average Coverage** | **${total_lines_sum}** | **${average_coverage_rounded}%** | ${avg_indicator} |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
           else
-            echo "**Average Coverage: ${average_coverage_rounded}%**" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+            echo "| | **Average Coverage** | **${total_lines_sum}** | **${average_coverage_rounded}%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
           fi
         fi
 
