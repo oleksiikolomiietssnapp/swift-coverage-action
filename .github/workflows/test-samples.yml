@@ -1,28 +1,22 @@
 name: Test Samples (Control)
 
+# ============================================================================
+# CONFIGURATION: Enable/disable test workflows by changing the boolean values
+# in the job 'if' conditions below (lines 24, 32, 40)
+#
+# - test-single:   Single job test
+# - test-matrix:   Matrix strategy test (3 configs)
+# - test-multiple: Multiple separate jobs test (3 jobs + combined comment)
+# ============================================================================
+
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-#  workflow_dispatch:
-#    inputs:
-#      run-single:
-#        description: 'Run single job test'
-#        type: boolean
-#        default: false
-#      run-matrix:
-#        description: 'Run matrix strategy test'
-#        type: boolean
-#        default: true
-#      run-multiple:
-#        description: 'Run multiple jobs test'
-#        type: boolean
-#        default: false
 
 jobs:
   test-single:
-#    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run-single }}
     if: false
     uses: ./.github/workflows/test-sample-single.yml
     permissions:
@@ -31,8 +25,7 @@ jobs:
       issues: write
 
   test-matrix:
-#    if: ${{ github.event_name == 'workflow_dispatch' || inputs.run-matrix }}
-    if: true
+    if: false
     uses: ./.github/workflows/test-sample-matrix.yml
     permissions:
       contents: read
@@ -40,8 +33,7 @@ jobs:
       issues: write
 
   test-multiple:
-#    if: ${{ github.event_name == 'workflow_dispatch' || inputs.run-multiple }}
-    if: false
+    if: true
     uses: ./.github/workflows/test-sample-combined.yml
     permissions:
       contents: read
