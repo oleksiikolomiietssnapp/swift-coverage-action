@@ -14,10 +14,10 @@ module.exports = async ({github, context, fs, coverageFile, header, jobId, thres
   if (threshold) {
     thresholdSection = `
 <details>
-<summary><b>Quality Threshold</b></summary>
+<summary><b>Coverage Threshold</b></summary>
 
-🔴 Below threshold: <${threshold}%
-🟢 Meets threshold: ${threshold}%+
+- ⚠️ Below threshold: <${threshold}%
+- ✅ Meets threshold: ≥${threshold}%
 
 </details>
 `;
