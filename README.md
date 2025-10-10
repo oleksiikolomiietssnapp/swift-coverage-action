@@ -67,10 +67,28 @@ Add the `skip-coverage` label (or custom label via `skip-label` input) to your P
 
 ## Output Example
 
-|   №  | Name | Executable Lines | Coverage |
-|:----:|------|-----------------:|---------:|
-| 1 | CoreLibrary | 58 | **89.66%** |
-| 2 | UtilsLibrary | 77 | **49.35%** |
+|   №  | Target | Lines | Coverage |
+|:----:|--------|------:|---------:|
+| 1 | CoreLibrary | 58 | **85.66%** |
+| 2 | NetworkLibrary | 35 | **70.00%** |
+| 3 | UtilsLibrary | 77 | **49.35%** |
+
+### With Quality Indicators (`show-quality-indicators: true`)
+
+|   №  | Target | Lines | Coverage | Quality |
+|:----:|--------|------:|---------:|:-------:|
+| 1 | CoreLibrary | 58 | **85.66%** | 🟢 |
+| 2 | NetworkLibrary | 35 | **70.00%** | 🟡 |
+| 3 | UtilsLibrary | 77 | **49.35%** | 🔴 |
+
+<details>
+<summary><b>Quality Thresholds</b></summary>
+
+🔴 Low: 0-60%
+🟡 Acceptable: 60-80%
+🟢 Good: 80-100%
+
+</details>
 
 ## PR Comment Management
 
@@ -87,6 +105,9 @@ Each job posts a uniquely identified comment that **only deletes its own previou
 | `coverage-comment-header` | `### 🛡️ Code Coverage Report` | PR comment header |
 | `skip-label` | `skip-coverage` | PR label to skip workflow execution |
 | `post-comment` | `true` | Post coverage comment (set `false` for combined comments) |
+| `show-quality-indicators` | `false` | Show quality indicators and Quality column (set `true` to enable) |
+| `coverage-threshold-low` | `60` | Coverage below this is marked as low (🔴) |
+| `coverage-threshold-good` | `80` | Coverage at or above this is marked as good (🟢) |
 
 ## Permissions
 

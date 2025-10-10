@@ -50,6 +50,23 @@ on:
         type: string
         default: ''
 
+      # Coverage thresholds
+      show-quality-indicators:
+        description: 'Show quality indicators (emoji) in coverage report'
+        required: false
+        type: boolean
+        default: false
+      coverage-threshold-low:
+        description: 'Coverage below this is marked as low (red)'
+        required: false
+        type: number
+        default: 60
+      coverage-threshold-good:
+        description: 'Coverage at or above this is marked as good (green)'
+        required: false
+        type: number
+        default: 80
+
     outputs:
       coverage-percentage:
         description: 'The calculated coverage percentage'
@@ -138,11 +155,20 @@ jobs:
           ALL_FILES=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("\\.swift$")) | select(.filename | test("/(Tests?|test)/") | not) | "\(.filename)|\(.summary.lines.count)|\(.summary.lines.covered)"' "$CODECOV_PATH")
         fi
 
-        # Initialize table
-        cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
-        |   №  | Name | Executable Lines | Coverage |
-        |:----:|------|-----------------:|---------:|
+        # Initialize table (with or without Quality column)
+        show_quality="${{ inputs.show-quality-indicators }}"
+
+        if [ "$show_quality" = "true" ]; then
+          cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
+        |   №  | Target | Lines | Coverage | Quality |
+        |:----:|--------|------:|---------:|:-------:|
         EOF
+        else
+          cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
+        |   №  | Target | Lines | Coverage |
+        |:----:|--------|------:|---------:|
+        EOF
+        fi
 
         # Create temporary files for target data
         TARGETS_DATA=$(mktemp)
@@ -209,10 +235,27 @@ jobs:
               fi
 
               target_coverage_rounded=$(echo "$target_coverage" | awk '{print int($1 * 100 + 0.5) / 100}')
-              target_coverage_with_percentage="${target_coverage_rounded}%"
 
-              # Add target row to table
-              echo "| $target_counter | $target_name | $total_lines | **$target_coverage_with_percentage** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+              # Add target row to table (with or without quality column)
+              if [ "$show_quality" = "true" ]; then
+                # Determine emoji indicator based on thresholds
+                coverage_indicator=""
+                threshold_low=${{ inputs.coverage-threshold-low }}
+                threshold_good=${{ inputs.coverage-threshold-good }}
+
+                coverage_int=$(echo "$target_coverage_rounded" | awk '{print int($1)}')
+                if [ "$coverage_int" -le "$threshold_low" ]; then
+                  coverage_indicator="🔴"
+                elif [ "$coverage_int" -le "$threshold_good" ]; then
+                  coverage_indicator="🟡"
+                else
+                  coverage_indicator="🟢"
+                fi
+
+                echo "| $target_counter | $target_name | $total_lines | **${target_coverage_rounded}%** | ${coverage_indicator} |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+              else
+                echo "| $target_counter | $target_name | $total_lines | **${target_coverage_rounded}%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+              fi
 
               # For overall average calculation
               echo "$target_coverage" >> /tmp/coverage_values.txt
@@ -222,7 +265,11 @@ jobs:
           done < <(sort "$AGGREGATED_DATA")
         else
           # Fallback: add a single entry with project name
-          echo "| 1 | $PROJECT_NAME | 0 | **0%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+          if [ "$show_quality" = "true" ]; then
+            echo "| 1 | $PROJECT_NAME | 0 | **0%** | 🔴 |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+          else
+            echo "| 1 | $PROJECT_NAME | 0 | **0%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+          fi
         fi
 
         # Calculate overall average coverage
@@ -252,6 +299,11 @@ jobs:
         cat ${{ env.COVERAGE_SUMMARY_FILE }} >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
 
+        # Output thresholds for comment footer
+        echo "threshold-low=${{ inputs.coverage-threshold-low }}" >> $GITHUB_OUTPUT
+        echo "threshold-acceptable=${{ inputs.coverage-threshold-acceptable }}" >> $GITHUB_OUTPUT
+        echo "threshold-good=${{ inputs.coverage-threshold-good }}" >> $GITHUB_OUTPUT
+
     - name: Comment on Pull Request
       if: github.event_name == 'pull_request' && inputs.post-comment
       uses: actions/github-script@v7
@@ -267,11 +319,18 @@ jobs:
           const customJobName = '${{ inputs.job-name }}';
           const jobId = customJobName || `${workflowName}:${jobName}`;
 
+          const showQuality = '${{ inputs.show-quality-indicators }}' === 'true';
+          const thresholds = showQuality ? {
+            low: ${{ inputs.coverage-threshold-low }},
+            good: ${{ inputs.coverage-threshold-good }}
+          } : null;
+
           await script({
             github,
             context,
             fs,
             coverageFile: '${{ env.COVERAGE_SUMMARY_FILE }}',
             header: '${{ inputs.coverage-comment-header }}',
-            jobId
+            jobId,
+            thresholds
           });

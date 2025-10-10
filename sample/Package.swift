@@ -16,6 +16,10 @@ let package = Package(
             name: "UtilsLibrary",
             targets: ["UtilsLibrary"]
         ),
+        .library(
+            name: "NetworkLibrary",
+            targets: ["NetworkLibrary"]
+        ),
     ],
     targets: [
         // Core library target
@@ -28,6 +32,12 @@ let package = Package(
         .target(
             name: "UtilsLibrary",
             dependencies: ["CoreLibrary"]
+        ),
+
+        // Network library target
+        .target(
+            name: "NetworkLibrary",
+            dependencies: []
         ),
 
         // Core library tests
@@ -43,6 +53,14 @@ let package = Package(
             name: "UtilsLibraryTests",
             dependencies: [
                 "UtilsLibrary"
+            ]
+        ),
+
+        // Network library tests
+        .testTarget(
+            name: "NetworkLibraryTests",
+            dependencies: [
+                "NetworkLibrary"
             ]
         ),
     ]

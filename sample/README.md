@@ -1,6 +1,6 @@
 # Sample Multi-Target Swift Package
 
-This is a sample Swift Package with **two targets** to demonstrate the Swift Coverage Action's ability to handle multiple targets and generate proper coverage reports.
+This is a sample Swift Package with **three targets** to demonstrate the Swift Coverage Action's ability to handle multiple targets and generate proper coverage reports.
 
 ## Package Structure
 
@@ -15,12 +15,16 @@ This is a sample Swift Package with **two targets** to demonstrate the Swift Cov
    - `ArrayUtils.swift` - Array processing utilities
    - `FontUtils.swift` - Cross-platform font utilities (iOS/macOS)
 
+3. **NetworkLibrary** - HTTP client utilities
+   - `HTTPClient.swift` - URL building and status code parsing
+
 ### Test Coverage
 
-The tests are intentionally **incomplete** to demonstrate partial coverage:
+The tests are intentionally **incomplete** to demonstrate quality thresholds:
 
-- **CoreLibrary**: ~90% coverage (most functions tested)
-- **UtilsLibrary**: ~65% coverage (some functions not tested, demonstrates mixed coverage)
+- **CoreLibrary**: ~85% coverage (🟢 Good)
+- **NetworkLibrary**: ~70% coverage (🟡 Acceptable)
+- **UtilsLibrary**: ~50% coverage (🔴 Low)
 
 ## Test Workflows
 
