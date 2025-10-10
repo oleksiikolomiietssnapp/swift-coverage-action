@@ -17,3 +17,5 @@ jobs:
       working-directory: "./sample"
       coverage-comment-header: "### 📊 Sample Coverage Report (Single Job)"
       post-comment: true
+      show-quality-indicators: true
+      coverage-threshold-low: 60
