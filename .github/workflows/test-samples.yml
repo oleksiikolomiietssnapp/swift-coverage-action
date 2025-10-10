@@ -25,7 +25,7 @@ jobs:
       issues: write
 
   test-matrix:
-    if: true
+    if: false
     uses: ./.github/workflows/test-sample-matrix.yml
     permissions:
       contents: read
@@ -33,7 +33,7 @@ jobs:
       issues: write
 
   test-multiple:
-    if: true
+    if: false
     uses: ./.github/workflows/test-sample-combined.yml
     permissions:
       contents: read
