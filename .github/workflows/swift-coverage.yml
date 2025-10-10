@@ -280,7 +280,7 @@ jobs:
 
         # Add average/combined coverage row if multiple targets
         if [ $target_count -gt 1 ]; then
-          echo "| - | *Average* | $total_lines_sum | **${average_coverage_rounded}%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+          echo "| | *Average* | $total_lines_sum | **${average_coverage_rounded}%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
         fi
 
         # Clean up temp files
