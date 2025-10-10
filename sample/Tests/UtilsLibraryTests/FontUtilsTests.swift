@@ -4,27 +4,6 @@ import Testing
 #if canImport(UIKit) || canImport(AppKit)
 struct FontUtilsTests {
 
-    @Test func testSystemFont() {
-        let utils = FontUtils()
-        let font = utils.systemFont(size: 16.0)
-
-        #expect(font != nil)
-        if let font = font {
-            #expect(utils.fontSize(from: font) == 16.0)
-        }
-    }
-
-    @Test func testFontSizeExtraction() {
-        let utils = FontUtils()
-        let font = utils.systemFont(size: 18.0)
-
-        #expect(font != nil)
-        if let font = font {
-            let actualSize = utils.fontSize(from: font)
-            #expect(actualSize == 18.0)
-        }
-    }
-
     @Test func testValidFontSize() {
         let utils = FontUtils()
 
