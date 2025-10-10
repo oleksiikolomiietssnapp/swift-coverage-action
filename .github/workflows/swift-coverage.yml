@@ -1,4 +1,4 @@
-name: Swift Test Coverage
+ name: Swift Test Coverage
 
 on:
   workflow_call:
@@ -260,8 +260,13 @@ jobs:
           const fs = require('fs');
           const coverageOutput = fs.readFileSync('${{ env.COVERAGE_SUMMARY_FILE }}', 'utf8');
 
-          // Create unique identifier for this specific job configuration
-          const jobId = '${{ inputs.job-name }}' || '${{ inputs.coverage-comment-header }}';
+          // Create unique identifier using GitHub's job context
+          // Format: workflow_name:job_name or use custom job-name if provided
+          const workflowName = '${{ github.workflow }}';
+          const jobName = '${{ github.job }}';
+          const customJobName = '${{ inputs.job-name }}';
+
+          const jobId = customJobName || `${workflowName}:${jobName}`;
           const commentMarker = `<!-- swift-coverage-id: ${jobId} -->`;
 
           const newComment = `
