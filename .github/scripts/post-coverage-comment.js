@@ -17,9 +17,8 @@ module.exports = async ({github, context, fs, coverageFile, header, jobId, thres
 <summary><b>Quality Thresholds</b></summary>
 
 🔴 Low: <${thresholds.low}%
-🟡 Acceptable: ${thresholds.low}-${thresholds.acceptable - 1}%
-🟢 Good: ${thresholds.acceptable}-${thresholds.good - 1}%
-✨ Excellent: ${thresholds.good}%+ (no indicator)
+🟡 Acceptable: ${thresholds.low}-${thresholds.good - 1}%
+🟢 Good: ${thresholds.good}%+
 
 </details>
 `;
