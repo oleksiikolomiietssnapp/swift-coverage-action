@@ -25,7 +25,7 @@ jobs:
             macos: "15"
           - swift: "6.2"
             xcode: "16.0"
-            macos: "15"
+            macos: "26"
     uses: ./.github/workflows/swift-coverage.yml
     with:
       macos-version: "${{ matrix.macos }}"
