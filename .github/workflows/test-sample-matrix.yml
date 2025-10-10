@@ -30,3 +30,4 @@ jobs:
       working-directory: "./sample"
       coverage-comment-header: "### 📊 Sample Coverage Report (Swift ${{ matrix.swift }} - Xcode ${{ matrix.xcode }})"
       post-comment: true  # Posts individual PR comment per matrix job
+      job-name: "Swift ${{ matrix.swift }} (Xcode ${{ matrix.xcode }}, macOS ${{ matrix.macos }})"
