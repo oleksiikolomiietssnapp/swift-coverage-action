@@ -244,9 +244,9 @@ jobs:
                 threshold_good=${{ inputs.coverage-threshold-good }}
 
                 coverage_int=$(echo "$target_coverage_rounded" | awk '{print int($1)}')
-                if [ "$coverage_int" -lt "$threshold_low" ]; then
+                if [ "$coverage_int" -le "$threshold_low" ]; then
                   coverage_indicator="🔴"
-                elif [ "$coverage_int" -lt "$threshold_good" ]; then
+                elif [ "$coverage_int" -le "$threshold_good" ]; then
                   coverage_indicator="🟡"
                 else
                   coverage_indicator="🟢"
