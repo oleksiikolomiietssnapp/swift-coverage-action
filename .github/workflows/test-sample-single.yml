@@ -18,5 +18,5 @@ jobs:
       coverage-comment-header: "### 📊 Sample Coverage Report (Single Job)"
       post-comment: true
       show-quality-indicators: true
-      coverage-threshold-low: 60
+      coverage-threshold-low: 80
       fail-on-low-coverage: true
