@@ -72,6 +72,10 @@ Add the `skip-coverage` label (or custom label via `skip-label` input) to your P
 | 1 | CoreLibrary | 58 | **89.66%** |
 | 2 | UtilsLibrary | 77 | **49.35%** |
 
+## PR Comment Management
+
+Each job posts a uniquely identified comment that **only deletes its own previous comments**. Multiple jobs (e.g., matrix configurations) can post comments simultaneously without interfering with each other.
+
 ## Inputs
 
 | Input | Default | Description |
