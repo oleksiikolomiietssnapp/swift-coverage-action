@@ -1,11 +1,7 @@
 name: Test Sample (Single Job)
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-  workflow_dispatch: # Allow manual triggering
+  workflow_call:
 
 jobs:
   coverage:
@@ -15,7 +11,9 @@ jobs:
       issues: write
     uses: ./.github/workflows/swift-coverage.yml
     with:
+      macos-version: "latest"
+      xcode-version: ""
       project-name-override: "SampleMultiTarget"
       working-directory: "./sample"
-      coverage-comment-header: "### 📊 Sample Coverage Report"
-      post-comment: true  # Default behavior - posts individual PR comment
+      coverage-comment-header: "### 📊 Sample Coverage Report (Single Job)"
+      post-comment: true

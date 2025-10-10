@@ -84,6 +84,21 @@ jobs:
     - name: List Xcode installations
       run: sudo ls -1 /Applications | grep "Xcode"
 
+    - name: Validate Xcode version
+      if: inputs.xcode-version != ''
+      run: |
+        REQUESTED_XCODE="Xcode_${{ inputs.xcode-version }}.app"
+        if [ ! -d "/Applications/$REQUESTED_XCODE" ]; then
+          echo "❌ Error: Xcode version ${{ inputs.xcode-version }} is not installed"
+          echo ""
+          echo "Available Xcode versions:"
+          sudo ls -1 /Applications | grep "Xcode" | sed 's/Xcode_//g' | sed 's/.app//g' | sed 's/^/  - /'
+          echo ""
+          echo "Please update your workflow to use one of the available versions."
+          exit 1
+        fi
+        echo "✅ Xcode ${{ inputs.xcode-version }} is available"
+
     - name: Select Xcode ${{ inputs.xcode-version }}
       if: inputs.xcode-version != ''
       run: sudo xcode-select -s ${{ env.XCODE_PATH }}
