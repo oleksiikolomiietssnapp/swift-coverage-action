@@ -357,7 +357,7 @@ jobs:
         COVERAGE_INT=$(echo "$COVERAGE" | awk '{print int($1)}')
 
         if [ "$COVERAGE_INT" -lt "$THRESHOLD" ]; then
-          echo "❌ Coverage ${COVERAGE}% is below threshold ${THRESHOLD}%"
+          echo "::error title=Coverage Below Threshold::Coverage ${COVERAGE}% is below the required threshold of ${THRESHOLD}%"
           exit 1
         else
           echo "✅ Coverage ${COVERAGE}% meets threshold ${THRESHOLD}%"
