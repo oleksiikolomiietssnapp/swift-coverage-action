@@ -1,15 +1,10 @@
-name: Test Sample (Combined Multi-Config)
+name: Test Sample (Multiple Jobs)
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-  workflow_dispatch: # Allow manual triggering
+  workflow_call:
 
 jobs:
   coverage-swift-6-0:
-    if: false  # Disabled - set to true to enable
     name: "Coverage (Swift 6.0, Xcode 16.4, macOS 15)"
     uses: ./.github/workflows/swift-coverage.yml
     with:
@@ -21,7 +16,6 @@ jobs:
       job-name: "Swift 6.0 (Xcode 16.4, macOS 15)"
 
   coverage-swift-6-1:
-    if: false  # Disabled - set to true to enable
     name: "Coverage (Swift 6.1, Xcode 26.0, macOS 15)"
     uses: ./.github/workflows/swift-coverage.yml
     with:
@@ -33,7 +27,6 @@ jobs:
       job-name: "Swift 6.1 (Xcode 26.0, macOS 15)"
 
   coverage-swift-6-2:
-    if: false  # Disabled - set to true to enable
     name: "Coverage (Swift 6.2, Xcode 26.1, macOS 26)"
     uses: ./.github/workflows/swift-coverage.yml
     with:
@@ -46,7 +39,7 @@ jobs:
 
   post-coverage-comment:
     name: "Post Combined Coverage Comment"
-    if: false && github.event_name == 'pull_request'  # Disabled - change false to true to enable
+    if: github.event_name == 'pull_request'
     needs: [coverage-swift-6-0, coverage-swift-6-1, coverage-swift-6-2]
     runs-on: ubuntu-latest
     permissions:

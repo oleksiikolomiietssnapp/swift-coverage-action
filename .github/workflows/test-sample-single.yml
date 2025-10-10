@@ -1,11 +1,7 @@
 name: Test Sample (Single Job)
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-  workflow_dispatch: # Allow manual triggering
+  workflow_call:
 
 jobs:
   coverage:
@@ -13,24 +9,11 @@ jobs:
       contents: read
       pull-requests: write
       issues: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - swift: "6.0"
-            xcode: "16.4"
-            macos: "15"
-          - swift: "6.1"
-            xcode: "26.0"
-            macos: "15"
-          - swift: "6.2"
-            xcode: "26.1"
-            macos: "26"
     uses: ./.github/workflows/swift-coverage.yml
     with:
-      macos-version: "${{ matrix.macos }}"
-      xcode-version: "${{ matrix.xcode }}"
+      macos-version: "latest"
+      xcode-version: ""
       project-name-override: "SampleMultiTarget"
       working-directory: "./sample"
-      coverage-comment-header: "### 📊 Sample Coverage Report (Swift ${{ matrix.swift }} - Xcode ${{ matrix.xcode }})"
-      post-comment: true  # Posts individual PR comment per matrix job
+      coverage-comment-header: "### 📊 Sample Coverage Report (Single Job)"
+      post-comment: true

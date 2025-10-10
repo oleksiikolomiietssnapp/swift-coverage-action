@@ -1,0 +1,46 @@
+name: Test Samples (Control)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      run-single:
+        description: 'Run single job test'
+        type: boolean
+        default: true
+      run-matrix:
+        description: 'Run matrix strategy test'
+        type: boolean
+        default: false
+      run-multiple:
+        description: 'Run multiple jobs test'
+        type: boolean
+        default: false
+
+jobs:
+  test-single:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run-single }}
+    uses: ./.github/workflows/test-sample-single.yml
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+  test-matrix:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run-matrix }}
+    uses: ./.github/workflows/test-sample-matrix.yml
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+  test-multiple:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run-multiple }}
+    uses: ./.github/workflows/test-sample-combined.yml
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
