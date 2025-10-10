@@ -50,19 +50,14 @@ on:
         type: string
         default: ''
 
-      # Coverage thresholds
-      show-quality-indicators:
-        description: 'Show quality indicators (emoji) in coverage report'
-        required: false
-        type: boolean
-        default: false
+      # Coverage threshold
       coverage-threshold:
-        description: 'Coverage threshold (below = 🔴, at or above = 🟢)'
+        description: 'Coverage threshold percentage (if set, enables quality indicators and Details section)'
         required: false
-        type: number
-        default: 80
+        type: string
+        default: ''
       fail-on-low-coverage:
-        description: 'Fail the job if coverage is below coverage-threshold'
+        description: 'Fail the job if coverage is below threshold'
         required: false
         type: boolean
         default: false
@@ -155,8 +150,13 @@ jobs:
           ALL_FILES=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("\\.swift$")) | select(.filename | test("/(Tests?|test)/") | not) | "\(.filename)|\(.summary.lines.count)|\(.summary.lines.covered)"' "$CODECOV_PATH")
         fi
 
-        # Initialize
-        show_quality="${{ inputs.show-quality-indicators }}"
+        # Initialize - check if threshold is set
+        THRESHOLD="${{ inputs.coverage-threshold }}"
+        if [ -n "$THRESHOLD" ]; then
+          show_quality="true"
+        else
+          show_quality="false"
+        fi
 
         # Create temporary files for target data
         TARGETS_DATA=$(mktemp)
@@ -262,9 +262,8 @@ jobs:
         # Determine header icon based on average coverage
         coverage_header="Coverage"
         if [ "$show_quality" = "true" ]; then
-          threshold=${{ inputs.coverage-threshold }}
           coverage_int=$(echo "$average_coverage_rounded" | awk '{print int($1)}')
-          if [ "$coverage_int" -lt "$threshold" ]; then
+          if [ "$coverage_int" -lt "$THRESHOLD" ]; then
             coverage_header="⚠️"
           else
             coverage_header="✅"
@@ -280,7 +279,7 @@ jobs:
 
         # Add average/combined coverage row if multiple targets
         if [ $target_count -gt 1 ]; then
-          echo "| | *Average* | $total_lines_sum | **${average_coverage_rounded}%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+          echo "| | <p align="right">**Total**</p> | $total_lines_sum | **${average_coverage_rounded}%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
         fi
 
         # Clean up temp files
@@ -294,8 +293,12 @@ jobs:
         cat ${{ env.COVERAGE_SUMMARY_FILE }} >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
 
-        # Output threshold for comment footer
-        echo "threshold=${{ inputs.coverage-threshold }}" >> $GITHUB_OUTPUT
+        # Output threshold for comment footer (if set)
+        if [ -n "$THRESHOLD" ]; then
+          echo "threshold=$THRESHOLD" >> $GITHUB_OUTPUT
+        else
+          echo "threshold=" >> $GITHUB_OUTPUT
+        fi
 
     - name: Comment on Pull Request
       if: github.event_name == 'pull_request' && inputs.post-comment
@@ -312,8 +315,8 @@ jobs:
           const customJobName = '${{ inputs.job-name }}';
           const jobId = customJobName || `${workflowName}:${jobName}`;
 
-          const showQuality = '${{ inputs.show-quality-indicators }}' === 'true';
-          const threshold = showQuality ? ${{ inputs.coverage-threshold }} : null;
+          const thresholdStr = '${{ steps.extract.outputs.threshold }}';
+          const threshold = thresholdStr ? parseInt(thresholdStr, 10) : null;
 
           await script({
             github,
@@ -326,10 +329,10 @@ jobs:
           });
 
     - name: Check Coverage Threshold
-      if: inputs.fail-on-low-coverage
+      if: inputs.fail-on-low-coverage && inputs.coverage-threshold != ''
       run: |
         COVERAGE=${{ steps.extract.outputs.coverage }}
-        THRESHOLD=${{ inputs.coverage-threshold }}
+        THRESHOLD="${{ inputs.coverage-threshold }}"
 
         echo "Coverage: ${COVERAGE}%"
         echo "Threshold: ${THRESHOLD}%"
