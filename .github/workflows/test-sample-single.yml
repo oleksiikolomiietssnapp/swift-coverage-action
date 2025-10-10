@@ -18,13 +18,13 @@ jobs:
       matrix:
         include:
           - swift: "6.0"
-            xcode: "16.0"
+            xcode: "16.4"
             macos: "15"
           - swift: "6.1"
-            xcode: "16.3"
+            xcode: "26.0"
             macos: "15"
           - swift: "6.2"
-            xcode: "16.0"
+            xcode: "26.1"
             macos: "26"
     uses: ./.github/workflows/swift-coverage.yml
     with:
