@@ -274,7 +274,7 @@ jobs:
         # Write final table with header + body
         cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
         |   №  | Target | Lines | $coverage_header |
-        |:----:|--------|------:|---------:|
+        |:----:|--------|------:|:---------:|
         EOF
         cat "$TABLE_BODY" >> ${{ env.COVERAGE_SUMMARY_FILE }}
 
