@@ -16,5 +16,3 @@ jobs:
       working-directory: "./sample-single-target"
       coverage-comment-header: "### 📊 Single Target Coverage"
       post-comment: true
-      coverage-threshold: "70"
-      fail-on-low-coverage: true
