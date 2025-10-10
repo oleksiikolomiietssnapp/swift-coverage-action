@@ -19,3 +19,4 @@ jobs:
       post-comment: true
       show-quality-indicators: true
       coverage-threshold-low: 60
+      fail-on-low-coverage: true
