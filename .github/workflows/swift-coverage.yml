@@ -157,8 +157,8 @@ jobs:
 
         # Initialize table
         cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
-        |   №  | Name | Executable Lines | Coverage |
-        |:----:|------|-----------------:|---------:|
+        |   №  | Target | Lines | Coverage | Quality |
+        |:----:|--------|------:|---------:|:-------:|
         EOF
 
         # Create temporary files for target data
@@ -243,10 +243,8 @@ jobs:
               fi
               # No indicator for >= 90%
 
-              target_coverage_with_percentage="${coverage_indicator}**${target_coverage_rounded}%**"
-
-              # Add target row to table
-              echo "| $target_counter | $target_name | $total_lines | $target_coverage_with_percentage |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+              # Add target row to table (coverage without emoji in separate column)
+              echo "| $target_counter | $target_name | $total_lines | **${target_coverage_rounded}%** | ${coverage_indicator} |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
 
               # For overall average calculation
               echo "$target_coverage" >> /tmp/coverage_values.txt
@@ -256,7 +254,7 @@ jobs:
           done < <(sort "$AGGREGATED_DATA")
         else
           # Fallback: add a single entry with project name
-          echo "| 1 | $PROJECT_NAME | 0 | **0%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+          echo "| 1 | $PROJECT_NAME | 0 | **0%** | 🔴 |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
         fi
 
         # Calculate overall average coverage
