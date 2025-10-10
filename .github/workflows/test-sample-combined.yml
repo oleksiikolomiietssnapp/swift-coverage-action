@@ -6,10 +6,14 @@ on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch: # Allow manual triggering
+  workflow_call:
+    inputs:
+      runs: false
 
 jobs:
   coverage-default:
     name: "Coverage (default: macOS latest, Xcode system)"
+    if: ${{ inputs.runs }}
     uses: ./.github/workflows/swift-coverage.yml
     with:
       project-name-override: "SampleMultiTarget"
@@ -19,6 +23,7 @@ jobs:
 
   coverage-macos-26:
     name: "Coverage (macOS 26, Xcode system)"
+    if: ${{ inputs.runs }}
     uses: ./.github/workflows/swift-coverage.yml
     with:
       macos-version: "26"
@@ -29,6 +34,7 @@ jobs:
 
   coverage-xcode-16-3:
     name: "Coverage (macOS latest, Xcode 16.3)"
+    if: ${{ inputs.runs }}
     uses: ./.github/workflows/swift-coverage.yml
     with:
       xcode-version: "16.3"
