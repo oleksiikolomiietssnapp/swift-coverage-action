@@ -1,4 +1,4 @@
-name: Test Sample (Multiple Targets)
+name: Test Sample (Single Target)
 
 on:
   workflow_call:
@@ -13,9 +13,6 @@ jobs:
     with:
       macos-version: "latest"
       xcode-version: ""
-      project-name-override: "SampleMultiTarget"
-      working-directory: "./sample"
-      coverage-comment-header: "### 📊 Multiple Targets Coverage"
+      working-directory: "./sample-single-target"
+      coverage-comment-header: "### 📊 Single Target Coverage"
       post-comment: true
-      coverage-threshold: "70"
-      fail-on-low-coverage: true

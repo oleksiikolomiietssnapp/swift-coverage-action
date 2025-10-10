@@ -20,11 +20,11 @@ This is a sample Swift Package with **three targets** to demonstrate the Swift C
 
 ### Test Coverage
 
-The tests are intentionally **incomplete** to demonstrate quality thresholds:
+The tests are intentionally **incomplete** to demonstrate different coverage levels:
 
-- **CoreLibrary**: ~85% coverage (🟢 Good)
-- **NetworkLibrary**: ~70% coverage (🟡 Acceptable)
-- **UtilsLibrary**: ~50% coverage (🔴 Low)
+- **CoreLibrary**: ~85% coverage (✅ Above threshold)
+- **NetworkLibrary**: ~70% coverage (⚠️ Below threshold)
+- **UtilsLibrary**: ~50% coverage (⚠️ Below threshold)
 
 ## Test Workflows
 

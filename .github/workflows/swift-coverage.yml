@@ -50,22 +50,17 @@ on:
         type: string
         default: ''
 
-      # Coverage thresholds
-      show-quality-indicators:
-        description: 'Show quality indicators (emoji) in coverage report'
+      # Coverage threshold
+      coverage-threshold:
+        description: 'Coverage threshold percentage (if set, enables quality indicators and Details section)'
+        required: false
+        type: string
+        default: ''
+      fail-on-low-coverage:
+        description: 'Fail the job if coverage is below threshold'
         required: false
         type: boolean
         default: false
-      coverage-threshold-low:
-        description: 'Coverage below this is marked as low (red)'
-        required: false
-        type: number
-        default: 60
-      coverage-threshold-good:
-        description: 'Coverage at or above this is marked as good (green)'
-        required: false
-        type: number
-        default: 80
 
     outputs:
       coverage-percentage:
@@ -155,23 +150,17 @@ jobs:
           ALL_FILES=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("\\.swift$")) | select(.filename | test("/(Tests?|test)/") | not) | "\(.filename)|\(.summary.lines.count)|\(.summary.lines.covered)"' "$CODECOV_PATH")
         fi
 
-        # Initialize table (with or without Quality column)
-        show_quality="${{ inputs.show-quality-indicators }}"
-
-        if [ "$show_quality" = "true" ]; then
-          cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
-        |   №  | Target | Lines | Coverage | Quality |
-        |:----:|--------|------:|---------:|:-------:|
-        EOF
+        # Initialize - check if threshold is set
+        THRESHOLD="${{ inputs.coverage-threshold }}"
+        if [ -n "$THRESHOLD" ]; then
+          show_quality="true"
         else
-          cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
-        |   №  | Target | Lines | Coverage |
-        |:----:|--------|------:|---------:|
-        EOF
+          show_quality="false"
         fi
 
         # Create temporary files for target data
         TARGETS_DATA=$(mktemp)
+        TABLE_BODY=$(mktemp)
 
         # Parse files and group by target
         while IFS='|' read -r filename total_lines covered_lines; do
@@ -223,6 +212,7 @@ jobs:
         target_counter=1
         total_coverage_sum=0
         target_count=0
+        total_lines_sum=0
 
         if [ -s "$AGGREGATED_DATA" ]; then
           # Process each target and add to table
@@ -236,40 +226,18 @@ jobs:
 
               target_coverage_rounded=$(echo "$target_coverage" | awk '{print int($1 * 100 + 0.5) / 100}')
 
-              # Add target row to table (with or without quality column)
-              if [ "$show_quality" = "true" ]; then
-                # Determine emoji indicator based on thresholds
-                coverage_indicator=""
-                threshold_low=${{ inputs.coverage-threshold-low }}
-                threshold_good=${{ inputs.coverage-threshold-good }}
-
-                coverage_int=$(echo "$target_coverage_rounded" | awk '{print int($1)}')
-                if [ "$coverage_int" -le "$threshold_low" ]; then
-                  coverage_indicator="🔴"
-                elif [ "$coverage_int" -le "$threshold_good" ]; then
-                  coverage_indicator="🟡"
-                else
-                  coverage_indicator="🟢"
-                fi
-
-                echo "| $target_counter | $target_name | $total_lines | **${target_coverage_rounded}%** | ${coverage_indicator} |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
-              else
-                echo "| $target_counter | $target_name | $total_lines | **${target_coverage_rounded}%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
-              fi
+              echo "| $target_counter | $target_name | $total_lines | **${target_coverage_rounded}%** |" >> "$TABLE_BODY"
 
               # For overall average calculation
               echo "$target_coverage" >> /tmp/coverage_values.txt
+              total_lines_sum=$((total_lines_sum + total_lines))
               target_counter=$((target_counter + 1))
 
             fi
           done < <(sort "$AGGREGATED_DATA")
         else
           # Fallback: add a single entry with project name
-          if [ "$show_quality" = "true" ]; then
-            echo "| 1 | $PROJECT_NAME | 0 | **0%** | 🔴 |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
-          else
-            echo "| 1 | $PROJECT_NAME | 0 | **0%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
-          fi
+          echo "| 1 | $PROJECT_NAME | 0 | **0%** |" >> "$TABLE_BODY"
         fi
 
         # Calculate overall average coverage
@@ -291,6 +259,32 @@ jobs:
 
         average_coverage_rounded=$(echo "$average_coverage" | awk '{print int($1 * 100 + 0.5) / 100}')
 
+        # Determine header icon based on average coverage
+        coverage_header="Coverage"
+        if [ "$show_quality" = "true" ]; then
+          coverage_int=$(echo "$average_coverage_rounded" | awk '{print int($1)}')
+          if [ "$coverage_int" -lt "$THRESHOLD" ]; then
+            coverage_header="⚠️"
+          else
+            coverage_header="✅"
+          fi
+        fi
+
+        # Write final table with header + body
+        cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
+        |   №  | Target | Lines | $coverage_header |
+        |:----:|--------|------:|:---------:|
+        EOF
+        cat "$TABLE_BODY" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+
+        # Add average/combined coverage row if multiple targets
+        if [ $target_count -gt 1 ]; then
+          echo "| | <p align="right">**Total**</p> | $total_lines_sum | **${average_coverage_rounded}%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+        fi
+
+        # Clean up temp files
+        rm -f "$TABLE_BODY"
+
         # Output for next steps
         echo "coverage=$average_coverage_rounded" >> $GITHUB_OUTPUT
 
@@ -299,10 +293,12 @@ jobs:
         cat ${{ env.COVERAGE_SUMMARY_FILE }} >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
 
-        # Output thresholds for comment footer
-        echo "threshold-low=${{ inputs.coverage-threshold-low }}" >> $GITHUB_OUTPUT
-        echo "threshold-acceptable=${{ inputs.coverage-threshold-acceptable }}" >> $GITHUB_OUTPUT
-        echo "threshold-good=${{ inputs.coverage-threshold-good }}" >> $GITHUB_OUTPUT
+        # Output threshold for comment footer (if set)
+        if [ -n "$THRESHOLD" ]; then
+          echo "threshold=$THRESHOLD" >> $GITHUB_OUTPUT
+        else
+          echo "threshold=" >> $GITHUB_OUTPUT
+        fi
 
     - name: Comment on Pull Request
       if: github.event_name == 'pull_request' && inputs.post-comment
@@ -319,11 +315,8 @@ jobs:
           const customJobName = '${{ inputs.job-name }}';
           const jobId = customJobName || `${workflowName}:${jobName}`;
 
-          const showQuality = '${{ inputs.show-quality-indicators }}' === 'true';
-          const thresholds = showQuality ? {
-            low: ${{ inputs.coverage-threshold-low }},
-            good: ${{ inputs.coverage-threshold-good }}
-          } : null;
+          const thresholdStr = '${{ steps.extract.outputs.threshold }}';
+          const threshold = thresholdStr ? parseInt(thresholdStr, 10) : null;
 
           await script({
             github,
@@ -332,5 +325,23 @@ jobs:
             coverageFile: '${{ env.COVERAGE_SUMMARY_FILE }}',
             header: '${{ inputs.coverage-comment-header }}',
             jobId,
-            thresholds
+            threshold
           });
+
+    - name: Check Coverage Threshold
+      if: inputs.fail-on-low-coverage && inputs.coverage-threshold != ''
+      run: |
+        COVERAGE=${{ steps.extract.outputs.coverage }}
+        THRESHOLD="${{ inputs.coverage-threshold }}"
+
+        echo "Coverage: ${COVERAGE}%"
+        echo "Threshold: ${THRESHOLD}%"
+
+        COVERAGE_INT=$(echo "$COVERAGE" | awk '{print int($1)}')
+
+        if [ "$COVERAGE_INT" -lt "$THRESHOLD" ]; then
+          echo "::error title=Coverage Below Threshold::Coverage ${COVERAGE}% is below the required threshold of ${THRESHOLD}%"
+          exit 1
+        else
+          echo "✅ Coverage ${COVERAGE}% meets threshold ${THRESHOLD}%"
+        fi

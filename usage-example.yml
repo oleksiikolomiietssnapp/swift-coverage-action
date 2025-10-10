@@ -14,17 +14,30 @@ on:
 
 jobs:
   coverage:
+    permissions:
+      contents: read
+      pull-requests: write  # Required for PR comments
+      issues: write         # Required for PR comments
     uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.0
     with:
-      xcode-version: "16.3"
-      # Optional: Override project name (defaults to repository name)
-      # project-name-override: "MyCustomProject"
-      # Optional: Override source path pattern
-      # source-path-override: "MyProject/Sources"
-      # Optional: Customize coverage comment header
-      # coverage-comment-header: "### 📊 Test Coverage"
-      # Optional: Label to skip workflow (defaults to "skip-coverage")
-      # skip-label: "skip-coverage"
+      # Basic configuration
+      macos-version: "latest"               # Optional: "latest", "15", "14"
+      xcode-version: "16.3"                 # Optional: specific version or system default
+      working-directory: "."                # Optional: defaults to root
+
+      # Project settings
+      project-name-override: "MyProject"    # Optional: defaults to repo name
+      source-path-override: "MyProject/Sources"  # Optional: custom source path
+
+      # PR comments
+      coverage-comment-header: "### 📊 Coverage"  # Optional: custom header
+      post-comment: true                    # Optional: false for multi-job combined comments
+      job-name: "Main Coverage"             # Optional: used in combined reports
+      skip-label: "skip-coverage"           # Optional: PR label to skip execution
+
+      # Quality threshold (when set, enables quality indicators)
+      coverage-threshold: "80"              # Optional: e.g., "80" (leave empty to disable)
+      fail-on-low-coverage: false           # Optional: fail if below threshold
 
   # Optional: Use coverage output in other jobs
   post-coverage:

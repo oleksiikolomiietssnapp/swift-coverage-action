@@ -16,9 +16,17 @@ on:
     branches: [ "main" ]
 
 jobs:
-  test-single:
-    if: true
+  test-multiple-targets:
+    if: false
     uses: ./.github/workflows/test-sample-single.yml
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+  test-single-target:
+    if: true
+    uses: ./.github/workflows/test-sample-single-target.yml
     permissions:
       contents: read
       pull-requests: write
@@ -32,7 +40,7 @@ jobs:
       pull-requests: write
       issues: write
 
-  test-multiple:
+  test-combined:
     if: false
     uses: ./.github/workflows/test-sample-combined.yml
     permissions:
