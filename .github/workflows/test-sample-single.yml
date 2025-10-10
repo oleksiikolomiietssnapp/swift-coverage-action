@@ -13,9 +13,24 @@ jobs:
       contents: read
       pull-requests: write
       issues: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - swift: "6.0"
+            xcode: "16.0"
+            macos: "15"
+          - swift: "6.1"
+            xcode: "16.3"
+            macos: "15"
+          - swift: "6.2"
+            xcode: "16.0"
+            macos: "15"
     uses: ./.github/workflows/swift-coverage.yml
     with:
+      macos-version: "${{ matrix.macos }}"
+      xcode-version: "${{ matrix.xcode }}"
       project-name-override: "SampleMultiTarget"
       working-directory: "./sample"
-      coverage-comment-header: "### 📊 Sample Coverage Report"
-      post-comment: true  # Default behavior - posts individual PR comment
+      coverage-comment-header: "### 📊 Sample Coverage Report (Swift ${{ matrix.swift }} - Xcode ${{ matrix.xcode }})"
+      post-comment: true  # Posts individual PR comment per matrix job
