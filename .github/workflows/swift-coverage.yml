@@ -296,6 +296,25 @@ jobs:
 
         average_coverage_rounded=$(echo "$average_coverage" | awk '{print int($1 * 100 + 0.5) / 100}')
 
+        # Add average/combined coverage row if multiple targets
+        if [ $target_count -gt 1 ]; then
+          echo "" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+          if [ "$show_quality" = "true" ]; then
+            # Determine quality indicator for average
+            coverage_int=$(echo "$average_coverage_rounded" | awk '{print int($1)}')
+            if [ "$coverage_int" -le "${{ inputs.coverage-threshold-low }}" ]; then
+              avg_indicator="🔴"
+            elif [ "$coverage_int" -le "${{ inputs.coverage-threshold-good }}" ]; then
+              avg_indicator="🟡"
+            else
+              avg_indicator="🟢"
+            fi
+            echo "**Average Coverage: ${average_coverage_rounded}%** ${avg_indicator}" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+          else
+            echo "**Average Coverage: ${average_coverage_rounded}%**" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+          fi
+        fi
+
         # Output for next steps
         echo "coverage=$average_coverage_rounded" >> $GITHUB_OUTPUT
 
