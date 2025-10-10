@@ -56,18 +56,13 @@ on:
         required: false
         type: boolean
         default: false
-      coverage-threshold-low:
-        description: 'Coverage below this is marked as low (red)'
-        required: false
-        type: number
-        default: 60
-      coverage-threshold-good:
-        description: 'Coverage at or above this is marked as good (green)'
+      coverage-threshold:
+        description: 'Coverage threshold (below = 🔴, at or above = 🟢)'
         required: false
         type: number
         default: 80
       fail-on-low-coverage:
-        description: 'Fail the job if coverage is below coverage-threshold-low'
+        description: 'Fail the job if coverage is below coverage-threshold'
         required: false
         type: boolean
         default: false
@@ -243,16 +238,13 @@ jobs:
 
               # Add target row to table (with or without quality column)
               if [ "$show_quality" = "true" ]; then
-                # Determine emoji indicator based on thresholds
+                # Determine emoji indicator based on threshold
                 coverage_indicator=""
-                threshold_low=${{ inputs.coverage-threshold-low }}
-                threshold_good=${{ inputs.coverage-threshold-good }}
+                threshold=${{ inputs.coverage-threshold }}
 
                 coverage_int=$(echo "$target_coverage_rounded" | awk '{print int($1)}')
-                if [ "$coverage_int" -le "$threshold_low" ]; then
+                if [ "$coverage_int" -lt "$threshold" ]; then
                   coverage_indicator="🔴"
-                elif [ "$coverage_int" -le "$threshold_good" ]; then
-                  coverage_indicator="🟡"
                 else
                   coverage_indicator="🟢"
                 fi
@@ -302,10 +294,8 @@ jobs:
           if [ "$show_quality" = "true" ]; then
             # Determine quality indicator for average
             coverage_int=$(echo "$average_coverage_rounded" | awk '{print int($1)}')
-            if [ "$coverage_int" -le "${{ inputs.coverage-threshold-low }}" ]; then
+            if [ "$coverage_int" -lt "${{ inputs.coverage-threshold }}" ]; then
               avg_indicator="🔴"
-            elif [ "$coverage_int" -le "${{ inputs.coverage-threshold-good }}" ]; then
-              avg_indicator="🟡"
             else
               avg_indicator="🟢"
             fi
@@ -323,10 +313,8 @@ jobs:
         cat ${{ env.COVERAGE_SUMMARY_FILE }} >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
 
-        # Output thresholds for comment footer
-        echo "threshold-low=${{ inputs.coverage-threshold-low }}" >> $GITHUB_OUTPUT
-        echo "threshold-acceptable=${{ inputs.coverage-threshold-acceptable }}" >> $GITHUB_OUTPUT
-        echo "threshold-good=${{ inputs.coverage-threshold-good }}" >> $GITHUB_OUTPUT
+        # Output threshold for comment footer
+        echo "threshold=${{ inputs.coverage-threshold }}" >> $GITHUB_OUTPUT
 
     - name: Comment on Pull Request
       if: github.event_name == 'pull_request' && inputs.post-comment
@@ -344,10 +332,7 @@ jobs:
           const jobId = customJobName || `${workflowName}:${jobName}`;
 
           const showQuality = '${{ inputs.show-quality-indicators }}' === 'true';
-          const thresholds = showQuality ? {
-            low: ${{ inputs.coverage-threshold-low }},
-            good: ${{ inputs.coverage-threshold-good }}
-          } : null;
+          const threshold = showQuality ? ${{ inputs.coverage-threshold }} : null;
 
           await script({
             github,
@@ -356,14 +341,14 @@ jobs:
             coverageFile: '${{ env.COVERAGE_SUMMARY_FILE }}',
             header: '${{ inputs.coverage-comment-header }}',
             jobId,
-            thresholds
+            threshold
           });
 
     - name: Check Coverage Threshold
       if: inputs.fail-on-low-coverage
       run: |
         COVERAGE=${{ steps.extract.outputs.coverage }}
-        THRESHOLD=${{ inputs.coverage-threshold-low }}
+        THRESHOLD=${{ inputs.coverage-threshold }}
 
         echo "Coverage: ${COVERAGE}%"
         echo "Threshold: ${THRESHOLD}%"

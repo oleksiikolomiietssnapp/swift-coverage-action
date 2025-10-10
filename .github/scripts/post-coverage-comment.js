@@ -1,7 +1,7 @@
 // Post individual coverage comment to PR
 // This script posts a single coverage report for one job/configuration
 
-module.exports = async ({github, context, fs, coverageFile, header, jobId, thresholds}) => {
+module.exports = async ({github, context, fs, coverageFile, header, jobId, threshold}) => {
   // Read coverage output from file
   const coverageOutput = fs.readFileSync(coverageFile, 'utf8');
 
@@ -9,16 +9,15 @@ module.exports = async ({github, context, fs, coverageFile, header, jobId, thres
   // Format: workflow_name:job_name or use custom job-name if provided
   const commentMarker = `<!-- swift-coverage-id: ${jobId} -->`;
 
-  // Build threshold legend if thresholds provided
+  // Build threshold legend if threshold provided
   let thresholdSection = '';
-  if (thresholds) {
+  if (threshold) {
     thresholdSection = `
 <details>
-<summary><b>Quality Thresholds</b></summary>
+<summary><b>Quality Threshold</b></summary>
 
-🔴 Low: 0-${thresholds.low}%
-🟡 Acceptable: ${thresholds.low}-${thresholds.good}%
-🟢 Good: ${thresholds.good}-100%
+🔴 Below threshold: <${threshold}%
+🟢 Meets threshold: ${threshold}%+
 
 </details>
 `;
