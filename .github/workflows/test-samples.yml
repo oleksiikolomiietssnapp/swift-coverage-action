@@ -16,25 +16,9 @@ on:
     branches: [ "main" ]
 
 jobs:
-  test-single:
-    if: false
+  test-multiple-targets:
+    if: true
     uses: ./.github/workflows/test-sample-single.yml
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
-
-  test-matrix:
-    if: false
-    uses: ./.github/workflows/test-sample-matrix.yml
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
-
-  test-multiple:
-    if: false
-    uses: ./.github/workflows/test-sample-combined.yml
     permissions:
       contents: read
       pull-requests: write
@@ -43,6 +27,22 @@ jobs:
   test-single-target:
     if: true
     uses: ./.github/workflows/test-sample-single-target.yml
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+  test-matrix:
+    if: true
+    uses: ./.github/workflows/test-sample-matrix.yml
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+  test-combined:
+    if: true
+    uses: ./.github/workflows/test-sample-combined.yml
     permissions:
       contents: read
       pull-requests: write
