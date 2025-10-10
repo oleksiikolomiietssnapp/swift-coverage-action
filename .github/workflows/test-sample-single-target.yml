@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 jobs:
-  coverage-core:
+  coverage:
     permissions:
       contents: read
       pull-requests: write
@@ -13,10 +13,8 @@ jobs:
     with:
       macos-version: "latest"
       xcode-version: ""
-      project-name-override: "CoreLibrary"
-      working-directory: "./sample"
-      test-filter: "CoreLibraryTests"
-      coverage-comment-header: "### 📊 CoreLibrary Coverage"
+      working-directory: "./sample-single-target"
+      coverage-comment-header: "### 📊 Single Target Coverage"
       post-comment: true
-      coverage-threshold: "80"
+      coverage-threshold: "70"
       fail-on-low-coverage: true

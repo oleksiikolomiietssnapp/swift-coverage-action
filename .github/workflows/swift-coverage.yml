@@ -32,11 +32,6 @@ on:
         required: false
         type: string
         default: '.'
-      test-filter:
-        description: 'Filter tests to run (e.g., "CoreLibraryTests" to run only that target)'
-        required: false
-        type: string
-        default: ''
       skip-label:
         description: 'Label name to skip workflow execution (default: skip-coverage)'
         required: false
@@ -125,16 +120,8 @@ jobs:
 
     - name: Run Swift Tests with Coverage
       run: |
-        TEST_FILTER="${{ inputs.test-filter }}"
-        if [ -n "$TEST_FILTER" ]; then
-          echo "Running tests with filter: $TEST_FILTER"
-          swift test --enable-swift-testing --enable-code-coverage --filter "$TEST_FILTER"
-          CODECOV_PATH=$(swift test --enable-swift-testing --enable-code-coverage --filter "$TEST_FILTER" --show-codecov-path)
-        else
-          echo "Running all tests"
-          swift test --enable-swift-testing --enable-code-coverage
-          CODECOV_PATH=$(swift test --enable-swift-testing --enable-code-coverage --show-codecov-path)
-        fi
+        swift test --enable-swift-testing --enable-code-coverage
+        CODECOV_PATH=$(swift test --enable-swift-testing --enable-code-coverage --show-codecov-path)
         echo "CODECOV_PATH=$CODECOV_PATH" >> $GITHUB_ENV
 
     - name: Extract Coverage Data
