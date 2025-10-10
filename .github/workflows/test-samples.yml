@@ -33,7 +33,7 @@ jobs:
       issues: write
 
   test-multiple:
-    if: false
+    if: true
     uses: ./.github/workflows/test-sample-combined.yml
     permissions:
       contents: read
