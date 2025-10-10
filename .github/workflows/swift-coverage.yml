@@ -159,8 +159,8 @@ jobs:
         show_quality="${{ inputs.show-quality-indicators }}"
 
         cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
-        | № | Target | Lines | Coverage |
-        |:--:|:----------------|------:|---------|
+        |   №  | Target | Lines | Coverage |
+        |:----:|--------|------:|---------:|
         EOF
 
         # Create temporary files for target data
@@ -230,32 +230,7 @@ jobs:
 
               target_coverage_rounded=$(echo "$target_coverage" | awk '{print int($1 * 100 + 0.5) / 100}')
 
-              # Build coverage bar if quality indicators enabled
-              coverage_display="${target_coverage_rounded}%"
-              if [ "$show_quality" = "true" ]; then
-                threshold=${{ inputs.coverage-threshold }}
-                coverage_int=$(echo "$target_coverage_rounded" | awk '{print int($1)}')
-
-                # Calculate number of blocks (10% per block)
-                blocks=$((coverage_int / 10))
-
-                # Determine color based on threshold
-                if [ "$coverage_int" -lt "$threshold" ]; then
-                  color="🟧"
-                else
-                  color="🟩"
-                fi
-
-                # Build bar
-                bar=""
-                for ((i=0; i<blocks; i++)); do
-                  bar="${bar}${color}"
-                done
-
-                coverage_display="${target_coverage_rounded}% ${bar}"
-              fi
-
-              echo "| $target_counter | $target_name | $total_lines | $coverage_display |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+              echo "| $target_counter | $target_name | $total_lines | **${target_coverage_rounded}%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
 
               # For overall average calculation
               echo "$target_coverage" >> /tmp/coverage_values.txt
@@ -266,11 +241,7 @@ jobs:
           done < <(sort "$AGGREGATED_DATA")
         else
           # Fallback: add a single entry with project name
-          coverage_display="0%"
-          if [ "$show_quality" = "true" ]; then
-            coverage_display="0% 🟧"
-          fi
-          echo "| 1 | $PROJECT_NAME | 0 | $coverage_display |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+          echo "| 1 | $PROJECT_NAME | 0 | **0%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
         fi
 
         # Calculate overall average coverage
@@ -294,35 +265,7 @@ jobs:
 
         # Add average/combined coverage row if multiple targets
         if [ $target_count -gt 1 ]; then
-          avg_coverage_display="**${average_coverage_rounded}%**"
-          row_icon=""
-
-          if [ "$show_quality" = "true" ]; then
-            threshold=${{ inputs.coverage-threshold }}
-            coverage_int=$(echo "$average_coverage_rounded" | awk '{print int($1)}')
-
-            # Calculate number of blocks (10% per block)
-            blocks=$((coverage_int / 10))
-
-            # Determine color and icon based on threshold
-            if [ "$coverage_int" -lt "$threshold" ]; then
-              color="🟧"
-              row_icon="⚠️"
-            else
-              color="🟩"
-              row_icon="✅"
-            fi
-
-            # Build bar
-            bar=""
-            for ((i=0; i<blocks; i++)); do
-              bar="${bar}${color}"
-            done
-
-            avg_coverage_display="**${average_coverage_rounded}%** ${bar}"
-          fi
-
-          echo "| ${row_icon} | **Average Coverage** | **${total_lines_sum}** | ${avg_coverage_display} |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+          echo "| - | *Average* | $total_lines_sum | **${average_coverage_rounded}%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
         fi
 
         # Output for next steps

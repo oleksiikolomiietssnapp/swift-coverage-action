@@ -9,15 +9,16 @@ module.exports = async ({github, context, fs, coverageFile, header, jobId, thres
   // Format: workflow_name:job_name or use custom job-name if provided
   const commentMarker = `<!-- swift-coverage-id: ${jobId} -->`;
 
-  // Build threshold legend if threshold provided
+  // Build threshold details if threshold provided
   let thresholdSection = '';
-  if (threshold) {
+  if (threshold !== null && threshold !== undefined) {
     thresholdSection = `
 <details>
-<summary><b>Coverage Threshold</b></summary>
+<summary><b>Details</b></summary>
 
-- ⚠️ Below threshold: <${threshold}%
-- ✅ Meets threshold: ≥${threshold}%
+### Threshold - ${threshold}%
+  - ⚠️ below
+  - ✅ meets
 
 </details>
 `;
