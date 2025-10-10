@@ -5,24 +5,25 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch:
-    inputs:
-      run-single:
-        description: 'Run single job test'
-        type: boolean
-        default: false
-      run-matrix:
-        description: 'Run matrix strategy test'
-        type: boolean
-        default: true
-      run-multiple:
-        description: 'Run multiple jobs test'
-        type: boolean
-        default: false
+#  workflow_dispatch:
+#    inputs:
+#      run-single:
+#        description: 'Run single job test'
+#        type: boolean
+#        default: false
+#      run-matrix:
+#        description: 'Run matrix strategy test'
+#        type: boolean
+#        default: true
+#      run-multiple:
+#        description: 'Run multiple jobs test'
+#        type: boolean
+#        default: false
 
 jobs:
   test-single:
-    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run-single }}
+#    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run-single }}
+    if: false
     uses: ./.github/workflows/test-sample-single.yml
     permissions:
       contents: read
@@ -30,7 +31,8 @@ jobs:
       issues: write
 
   test-matrix:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run-matrix }}
+#    if: ${{ github.event_name == 'workflow_dispatch' || inputs.run-matrix }}
+    if: true
     uses: ./.github/workflows/test-sample-matrix.yml
     permissions:
       contents: read
@@ -38,7 +40,8 @@ jobs:
       issues: write
 
   test-multiple:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run-multiple }}
+#    if: ${{ github.event_name == 'workflow_dispatch' || inputs.run-multiple }}
+    if: false
     uses: ./.github/workflows/test-sample-combined.yml
     permissions:
       contents: read
