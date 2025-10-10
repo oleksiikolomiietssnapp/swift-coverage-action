@@ -6,47 +6,48 @@ on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch: # Allow manual triggering
-  workflow_call:
-    inputs:
-      runs: false
 
 jobs:
-  coverage-default:
-    name: "Coverage (default: macOS latest, Xcode system)"
-    if: ${{ inputs.runs }}
+  coverage-swift-6-0:
+    if: false  # Disabled - set to true to enable
+    name: "Coverage (Swift 6.0, Xcode 16.4, macOS 15)"
     uses: ./.github/workflows/swift-coverage.yml
     with:
+      macos-version: "15"
+      xcode-version: "16.4"
       project-name-override: "SampleMultiTarget"
       working-directory: "./sample"
       post-comment: false
-      job-name: "macOS latest + Xcode system"
+      job-name: "Swift 6.0 (Xcode 16.4, macOS 15)"
 
-  coverage-macos-26:
-    name: "Coverage (macOS 26, Xcode system)"
-    if: ${{ inputs.runs }}
+  coverage-swift-6-1:
+    if: false  # Disabled - set to true to enable
+    name: "Coverage (Swift 6.1, Xcode 26.0, macOS 15)"
+    uses: ./.github/workflows/swift-coverage.yml
+    with:
+      macos-version: "15"
+      xcode-version: "26.0"
+      project-name-override: "SampleMultiTarget"
+      working-directory: "./sample"
+      post-comment: false
+      job-name: "Swift 6.1 (Xcode 26.0, macOS 15)"
+
+  coverage-swift-6-2:
+    if: false  # Disabled - set to true to enable
+    name: "Coverage (Swift 6.2, Xcode 26.1, macOS 26)"
     uses: ./.github/workflows/swift-coverage.yml
     with:
       macos-version: "26"
+      xcode-version: "26.1"
       project-name-override: "SampleMultiTarget"
       working-directory: "./sample"
       post-comment: false
-      job-name: "macOS 26 + Xcode system"
-
-  coverage-xcode-16-3:
-    name: "Coverage (macOS latest, Xcode 16.3)"
-    if: ${{ inputs.runs }}
-    uses: ./.github/workflows/swift-coverage.yml
-    with:
-      xcode-version: "16.3"
-      project-name-override: "SampleMultiTarget"
-      working-directory: "./sample"
-      post-comment: false
-      job-name: "macOS latest + Xcode 16.3"
+      job-name: "Swift 6.2 (Xcode 26.1, macOS 26)"
 
   post-coverage-comment:
     name: "Post Combined Coverage Comment"
-    if: github.event_name == 'pull_request'
-    needs: [coverage-default, coverage-macos-26, coverage-xcode-16-3]
+    if: false && github.event_name == 'pull_request'  # Disabled - change false to true to enable
+    needs: [coverage-swift-6-0, coverage-swift-6-1, coverage-swift-6-2]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -57,23 +58,23 @@ jobs:
             // Build coverage sections from job outputs
             const sections = [];
 
-            const job1Name = "${{ needs.coverage-default.outputs.job-name }}";
-            const job1Coverage = "${{ needs.coverage-default.outputs.coverage-percentage }}";
-            const job1Table = `${{ needs.coverage-default.outputs.coverage-table }}`;
+            const job1Name = "${{ needs.coverage-swift-6-0.outputs.job-name }}";
+            const job1Coverage = "${{ needs.coverage-swift-6-0.outputs.coverage-percentage }}";
+            const job1Table = `${{ needs.coverage-swift-6-0.outputs.coverage-table }}`;
             if (job1Name && job1Coverage) {
               sections.push({ name: job1Name, coverage: job1Coverage, table: job1Table });
             }
 
-            const job2Name = "${{ needs.coverage-macos-26.outputs.job-name }}";
-            const job2Coverage = "${{ needs.coverage-macos-26.outputs.coverage-percentage }}";
-            const job2Table = `${{ needs.coverage-macos-26.outputs.coverage-table }}`;
+            const job2Name = "${{ needs.coverage-swift-6-1.outputs.job-name }}";
+            const job2Coverage = "${{ needs.coverage-swift-6-1.outputs.coverage-percentage }}";
+            const job2Table = `${{ needs.coverage-swift-6-1.outputs.coverage-table }}`;
             if (job2Name && job2Coverage) {
               sections.push({ name: job2Name, coverage: job2Coverage, table: job2Table });
             }
 
-            const job3Name = "${{ needs.coverage-xcode-16-3.outputs.job-name }}";
-            const job3Coverage = "${{ needs.coverage-xcode-16-3.outputs.coverage-percentage }}";
-            const job3Table = `${{ needs.coverage-xcode-16-3.outputs.coverage-table }}`;
+            const job3Name = "${{ needs.coverage-swift-6-2.outputs.job-name }}";
+            const job3Coverage = "${{ needs.coverage-swift-6-2.outputs.coverage-percentage }}";
+            const job3Table = `${{ needs.coverage-swift-6-2.outputs.coverage-table }}`;
             if (job3Name && job3Coverage) {
               sections.push({ name: job3Name, coverage: job3Coverage, table: job3Table });
             }
