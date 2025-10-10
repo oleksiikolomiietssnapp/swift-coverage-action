@@ -22,7 +22,7 @@ on:
 
 jobs:
   test-single:
-    if: ${{ inputs.run-single }}
+    if: ${{ workflow_dispatch.inputs.run-single }}
     uses: ./.github/workflows/test-sample-single.yml
     permissions:
       contents: read
