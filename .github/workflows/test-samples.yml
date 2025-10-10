@@ -10,11 +10,11 @@ on:
       run-single:
         description: 'Run single job test'
         type: boolean
-        default: true
+        default: false
       run-matrix:
         description: 'Run matrix strategy test'
         type: boolean
-        default: false
+        default: true
       run-multiple:
         description: 'Run multiple jobs test'
         type: boolean
