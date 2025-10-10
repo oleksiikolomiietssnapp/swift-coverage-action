@@ -66,6 +66,11 @@ on:
         required: false
         type: number
         default: 80
+      fail-on-low-coverage:
+        description: 'Fail the job if coverage is below coverage-threshold-low'
+        required: false
+        type: boolean
+        default: false
 
     outputs:
       coverage-percentage:
@@ -334,3 +339,21 @@ jobs:
             jobId,
             thresholds
           });
+
+    - name: Check Coverage Threshold
+      if: inputs.fail-on-low-coverage
+      run: |
+        COVERAGE=${{ steps.extract.outputs.coverage }}
+        THRESHOLD=${{ inputs.coverage-threshold-low }}
+
+        echo "Coverage: ${COVERAGE}%"
+        echo "Threshold: ${THRESHOLD}%"
+
+        COVERAGE_INT=$(echo "$COVERAGE" | awk '{print int($1)}')
+
+        if [ "$COVERAGE_INT" -lt "$THRESHOLD" ]; then
+          echo "❌ Coverage ${COVERAGE}% is below threshold ${THRESHOLD}%"
+          exit 1
+        else
+          echo "✅ Coverage ${COVERAGE}% meets threshold ${THRESHOLD}%"
+        fi
