@@ -1,4 +1,4 @@
- name: Swift Test Coverage
+name: Swift Test Coverage
 
 on:
   workflow_call:
