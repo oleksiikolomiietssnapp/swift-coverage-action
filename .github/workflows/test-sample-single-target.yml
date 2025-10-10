@@ -15,6 +15,7 @@ jobs:
       xcode-version: ""
       project-name-override: "CoreLibrary"
       working-directory: "./sample"
+      test-filter: "CoreLibraryTests"
       coverage-comment-header: "### 📊 CoreLibrary Coverage"
       post-comment: true
       coverage-threshold: "80"
