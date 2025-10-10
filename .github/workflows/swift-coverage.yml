@@ -50,6 +50,23 @@ on:
         type: string
         default: ''
 
+      # Coverage thresholds
+      coverage-threshold-low:
+        description: 'Coverage below this is marked as low (red)'
+        required: false
+        type: number
+        default: 60
+      coverage-threshold-acceptable:
+        description: 'Coverage below this is marked as acceptable (yellow)'
+        required: false
+        type: number
+        default: 80
+      coverage-threshold-good:
+        description: 'Coverage below this is marked as good (green)'
+        required: false
+        type: number
+        default: 90
+
     outputs:
       coverage-percentage:
         description: 'The calculated coverage percentage'
@@ -209,10 +226,27 @@ jobs:
               fi
 
               target_coverage_rounded=$(echo "$target_coverage" | awk '{print int($1 * 100 + 0.5) / 100}')
-              target_coverage_with_percentage="${target_coverage_rounded}%"
+
+              # Determine emoji indicator based on thresholds
+              coverage_indicator=""
+              threshold_low=${{ inputs.coverage-threshold-low }}
+              threshold_acceptable=${{ inputs.coverage-threshold-acceptable }}
+              threshold_good=${{ inputs.coverage-threshold-good }}
+
+              coverage_int=$(echo "$target_coverage_rounded" | awk '{print int($1)}')
+              if [ "$coverage_int" -lt "$threshold_low" ]; then
+                coverage_indicator="🔴 "
+              elif [ "$coverage_int" -lt "$threshold_acceptable" ]; then
+                coverage_indicator="🟡 "
+              elif [ "$coverage_int" -lt "$threshold_good" ]; then
+                coverage_indicator="🟢 "
+              fi
+              # No indicator for >= 90%
+
+              target_coverage_with_percentage="${coverage_indicator}**${target_coverage_rounded}%**"
 
               # Add target row to table
-              echo "| $target_counter | $target_name | $total_lines | **$target_coverage_with_percentage** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+              echo "| $target_counter | $target_name | $total_lines | $target_coverage_with_percentage |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
 
               # For overall average calculation
               echo "$target_coverage" >> /tmp/coverage_values.txt
@@ -252,6 +286,11 @@ jobs:
         cat ${{ env.COVERAGE_SUMMARY_FILE }} >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
 
+        # Output thresholds for comment footer
+        echo "threshold-low=${{ inputs.coverage-threshold-low }}" >> $GITHUB_OUTPUT
+        echo "threshold-acceptable=${{ inputs.coverage-threshold-acceptable }}" >> $GITHUB_OUTPUT
+        echo "threshold-good=${{ inputs.coverage-threshold-good }}" >> $GITHUB_OUTPUT
+
     - name: Comment on Pull Request
       if: github.event_name == 'pull_request' && inputs.post-comment
       uses: actions/github-script@v7
@@ -273,5 +312,10 @@ jobs:
             fs,
             coverageFile: '${{ env.COVERAGE_SUMMARY_FILE }}',
             header: '${{ inputs.coverage-comment-header }}',
-            jobId
+            jobId,
+            thresholds: {
+              low: ${{ inputs.coverage-threshold-low }},
+              acceptable: ${{ inputs.coverage-threshold-acceptable }},
+              good: ${{ inputs.coverage-threshold-good }}
+            }
           });
