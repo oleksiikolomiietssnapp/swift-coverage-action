@@ -155,16 +155,12 @@ jobs:
           ALL_FILES=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("\\.swift$")) | select(.filename | test("/(Tests?|test)/") | not) | "\(.filename)|\(.summary.lines.count)|\(.summary.lines.covered)"' "$CODECOV_PATH")
         fi
 
-        # Initialize table
+        # Initialize
         show_quality="${{ inputs.show-quality-indicators }}"
-
-        cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
-        |   №  | Target | Lines | Coverage |
-        |:----:|--------|------:|---------:|
-        EOF
 
         # Create temporary files for target data
         TARGETS_DATA=$(mktemp)
+        TABLE_BODY=$(mktemp)
 
         # Parse files and group by target
         while IFS='|' read -r filename total_lines covered_lines; do
@@ -230,7 +226,7 @@ jobs:
 
               target_coverage_rounded=$(echo "$target_coverage" | awk '{print int($1 * 100 + 0.5) / 100}')
 
-              echo "| $target_counter | $target_name | $total_lines | **${target_coverage_rounded}%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+              echo "| $target_counter | $target_name | $total_lines | **${target_coverage_rounded}%** |" >> "$TABLE_BODY"
 
               # For overall average calculation
               echo "$target_coverage" >> /tmp/coverage_values.txt
@@ -241,7 +237,7 @@ jobs:
           done < <(sort "$AGGREGATED_DATA")
         else
           # Fallback: add a single entry with project name
-          echo "| 1 | $PROJECT_NAME | 0 | **0%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+          echo "| 1 | $PROJECT_NAME | 0 | **0%** |" >> "$TABLE_BODY"
         fi
 
         # Calculate overall average coverage
@@ -263,10 +259,32 @@ jobs:
 
         average_coverage_rounded=$(echo "$average_coverage" | awk '{print int($1 * 100 + 0.5) / 100}')
 
+        # Determine header icon based on average coverage
+        coverage_header="Coverage"
+        if [ "$show_quality" = "true" ]; then
+          threshold=${{ inputs.coverage-threshold }}
+          coverage_int=$(echo "$average_coverage_rounded" | awk '{print int($1)}')
+          if [ "$coverage_int" -lt "$threshold" ]; then
+            coverage_header="⚠️"
+          else
+            coverage_header="✅"
+          fi
+        fi
+
+        # Write final table with header + body
+        cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
+        |   №  | Target | Lines | $coverage_header |
+        |:----:|--------|------:|---------:|
+        EOF
+        cat "$TABLE_BODY" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+
         # Add average/combined coverage row if multiple targets
         if [ $target_count -gt 1 ]; then
           echo "| - | *Average* | $total_lines_sum | **${average_coverage_rounded}%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
         fi
+
+        # Clean up temp files
+        rm -f "$TABLE_BODY"
 
         # Output for next steps
         echo "coverage=$average_coverage_rounded" >> $GITHUB_OUTPUT
