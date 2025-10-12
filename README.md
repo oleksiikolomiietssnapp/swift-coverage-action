@@ -1,6 +1,5 @@
-# Swift Coverage Action
 
-A GitHub Actions workflow for generating Swift Package Manager test coverage reports with PR comments.
+A GitHub Actions workflow for generating Swift Package Manager test coverage reports with PR comments.# Swift Coverage Action
 
 <div align="center">
 
@@ -14,6 +13,10 @@ A GitHub Actions workflow for generating Swift Package Manager test coverage rep
 [![Xcode](https://img.shields.io/badge/Xcode-Configurable_(default:_system)-blue.svg?logo=xcode)](https://developer.apple.com/xcode/)
 
 </div>
+
+## Basic look of the comment
+
+<img width="917" height="282" alt="screenshot" src="https://github.com/user-attachments/assets/ec96651d-c42c-4633-9c8c-1931b46cb949" />
 
 ## Quick Start
 
