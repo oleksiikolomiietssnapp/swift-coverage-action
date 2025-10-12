@@ -19,52 +19,47 @@ A GitHub Actions workflow for generating Swift Package Manager test coverage rep
 
 ```yaml
 name: Coverage
-on: [push, pull_request]
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  test:
-    permissions:
-      contents: read
-      pull-requests: write  # Required for PR comments
-      issues: write         # Required for PR comments
-    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main
+  coverage:
+    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.3
 ```
+
+Permissions are inherited automatically when needed.
+
+## Templates
+
+Check out [`templates/`](templates/) for ready-to-use examples:
+- [`minimal.yml`](templates/minimal.yml) - Simplest setup
+- [`basic.yml`](templates/basic.yml) - Common options
+- [`matrix.yml`](templates/matrix.yml) - Multiple Xcode/macOS versions
+- [`combined.yml`](templates/combined.yml) - Multi-job, single comment
 
 ## Configuration
 
 ```yaml
-jobs:
-  test:
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
-    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main
-    with:
-      # Environment
-      macos-version: "latest"            # Optional: "latest", "15", "14"
-      xcode-version: "16.4"              # Optional: specific version or system default
-      working-directory: "./my-package"  # Optional: defaults to root
+uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main
+with:
+  # Environment
+  macos-version: "latest"            # "latest", "15", "14", etc.
+  xcode-version: "16.4"              # Specific version or system default
+  working-directory: "./my-package"  # Defaults to repo root
 
-      # Project settings
-      project-name-override: "MyProject" # Optional: defaults to repo name
-      skip-label: "skip-coverage"        # Optional: PR label to skip execution
+  # PR comments
+  coverage-comment-header: "### 📊 Coverage"
+  post-comment: true                 # Set false for combined multi-job comments
+  job-name: "Config Name"            # Identifier for combined reports
 
-      # PR comments
-      post-comment: true                 # Optional: false for multi-job combined comments
-      job-name: "Configuration Name"     # Optional: used in combined comments
-      coverage-comment-header: "### 📊 Coverage" # Optional: custom header
-
-      # Quality threshold
-      coverage-threshold: "80"           # Optional: enables ✅/⚠️ indicators when set
-      fail-on-low-coverage: false        # Optional: fail job if below threshold
+  # Quality
+  coverage-threshold: "80"           # Enables ✅/⚠️ indicators
+  fail-on-low-coverage: false        # Fail job if below threshold
 ```
-
-See [sample workflows](.github/workflows) for examples:
-- `test-sample-single-target.yml` - Single target package
-- `test-sample-single.yml` - Multiple targets package
-- `test-sample-matrix.yml` - Matrix strategy (multiple configurations)
-- `test-sample-combined.yml` - Combined multi-job reporting
 
 ## Skipping Workflow
 
@@ -154,26 +149,27 @@ For packages with one target, no Total row is shown:
 
 Each job posts a uniquely identified comment that **only deletes its own previous comments**. Multiple jobs (e.g., matrix configurations) can post comments simultaneously without interfering with each other.
 
-## Inputs
+## All Inputs
 
 | Input | Default | Description |
 |-------|---------|-------------|
-| `macos-version` | `latest` | macOS runner version (`latest`, `15`, `14`, etc.) |
-| `xcode-version` | system default | Xcode version (e.g., `16.4`, `15.2`) |
-| `project-name-override` | repo name | Override project name |
+| `macos-version` | `latest` | macOS runner: `latest`, `15`, `14` |
+| `xcode-version` | system default | Xcode version: `16.4`, `15.2` |
 | `working-directory` | `.` | Package directory |
+| `project-name-override` | repo name | Override project name |
+| `skip-label` | `skip-coverage` | PR label to skip execution |
+| `post-comment` | `true` | Post PR comment (`false` for combined) |
+| `job-name` | _(empty)_ | Job identifier for combined reports |
 | `coverage-comment-header` | `### 🛡️ Code Coverage Report` | PR comment header |
-| `skip-label` | `skip-coverage` | PR label to skip workflow execution |
-| `post-comment` | `true` | Post coverage comment (set `false` for combined comments) |
-| `coverage-threshold` | _(empty)_ | Coverage threshold (e.g., `"80"`). When set, enables quality indicators |
-| `fail-on-low-coverage` | `false` | Fail the job if coverage is below threshold |
+| `coverage-threshold` | _(empty)_ | Threshold % (enables ✅/⚠️) |
+| `fail-on-low-coverage` | `false` | Fail if below threshold |
 
 ## Permissions
 
-When using this workflow, you need to grant the following permissions:
-- `contents: read` - Required to checkout code
-- `pull-requests: write` - Required to post PR comments (only if `post-comment: true`)
-- `issues: write` - Required to post PR comments (only if `post-comment: true`)
+Required permissions in your workflow:
+- `contents: read` - Checkout code
+- `pull-requests: write` - Post PR comments
+- `issues: write` - Post PR comments
 
 ## License
 

@@ -1,0 +1,60 @@
+# Combined reporting - multiple jobs, single PR comment
+# Copy to your repository's .github/workflows/ folder
+# Also create .github/scripts/post-combined-comment.js (see templates/README.md)
+
+name: Coverage Combined
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  coverage-ios:
+    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.3
+    with:
+      macos-version: "15"
+      xcode-version: "16.1"
+      post-comment: false  # Disable individual comments
+      job-name: "iOS Target"
+      coverage-threshold: "80"
+
+  coverage-macos:
+    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.3
+    with:
+      macos-version: "15"
+      xcode-version: "16.1"
+      working-directory: "./macos-package"
+      post-comment: false
+      job-name: "macOS Target"
+      coverage-threshold: "80"
+
+  post-combined-comment:
+    if: github.event_name == 'pull_request'
+    needs: [coverage-ios, coverage-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const script = require('./.github/scripts/post-combined-comment.js');
+
+            const jobOutputs = [
+              {
+                name: "${{ needs.coverage-ios.outputs.job-name }}",
+                coverage: "${{ needs.coverage-ios.outputs.coverage-percentage }}",
+                table: `${{ needs.coverage-ios.outputs.coverage-table }}`
+              },
+              {
+                name: "${{ needs.coverage-macos.outputs.job-name }}",
+                coverage: "${{ needs.coverage-macos.outputs.coverage-percentage }}",
+                table: `${{ needs.coverage-macos.outputs.coverage-table }}`
+              }
+            ];
+
+            await script({github, context, jobOutputs});

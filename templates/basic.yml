@@ -1,10 +1,7 @@
-# Example usage of Swift Coverage Action
-# Place this file in your repository's .github/workflows/ folder
-#
-# For latest version, replace @0.1.0 with @main
-# For stability, pin to a specific version like @0.1.0
+# Basic usage with common configuration options
+# Copy to your repository's .github/workflows/ folder
 
-name: Test and Coverage
+name: Coverage
 
 on:
   push:
@@ -14,11 +11,7 @@ on:
 
 jobs:
   coverage:
-    permissions:
-      contents: read
-      pull-requests: write  # Required for PR comments
-      issues: write         # Required for PR comments
-    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.0
+    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.3
     with:
       # Basic configuration
       macos-version: "latest"               # Optional: "latest", "15", "14"

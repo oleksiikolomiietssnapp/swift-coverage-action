@@ -1,0 +1,14 @@
+# Minimal setup - just copy and go
+# Copy to your repository's .github/workflows/ folder
+
+name: Coverage
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  coverage:
+    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.3

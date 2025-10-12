@@ -1,0 +1,28 @@
+# Matrix strategy - test multiple configurations in parallel
+# Copy to your repository's .github/workflows/ folder
+
+name: Coverage Matrix
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  coverage:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - xcode: "16.1"
+            macos: "15"
+          - xcode: "15.4"
+            macos: "14"
+    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.3
+    with:
+      macos-version: "${{ matrix.macos }}"
+      xcode-version: "${{ matrix.xcode }}"
+      coverage-comment-header: "### 📊 Coverage (Xcode ${{ matrix.xcode }}, macOS ${{ matrix.macos }})"
+      job-name: "Xcode ${{ matrix.xcode }}, macOS ${{ matrix.macos }}"
+      coverage-threshold: "80"
