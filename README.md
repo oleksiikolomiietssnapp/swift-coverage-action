@@ -1,7 +1,5 @@
 # Swift Coverage Action
 
-A GitHub Actions workflow for generating Swift Package Manager test coverage reports with PR comments.
-
 <div align="center">
 
 [![Version](https://img.shields.io/github/v/tag/oleksiikolomiietssnapp/swift-coverage-action)](https://github.com/oleksiikolomiietssnapp/swift-coverage-action/tags)
