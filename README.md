@@ -11,7 +11,23 @@
 [![macOS](https://img.shields.io/badge/macOS-Configurable_(default:_latest)-blue.svg?logo=apple)](https://github.com/actions/runner-images)
 [![Xcode](https://img.shields.io/badge/Xcode-Configurable_(default:_system)-blue.svg?logo=xcode)](https://developer.apple.com/xcode/)
 
-<br/>
+</div>
+
+## What It Does
+
+Automated code coverage reporting for Swift packages
+
+```
+┌───────┐      ┌───────┐      ┌─────────┐
+│ Setup │ ───▶ │ Tests │ ───▶ │ Analyze │
+└───────┘      └───────┘      └─────────┘
+                                    │
+                                    │
+                                    ▼
+                              ┌────────┐
+                              │ Report │
+                              └────────┘
+```
 
 <img width="917" alt="Example PR comment" src="https://github.com/user-attachments/assets/ec96651d-c42c-4633-9c8c-1931b46cb949" />
 

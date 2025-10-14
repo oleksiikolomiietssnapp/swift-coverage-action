@@ -1,6 +1,6 @@
 # Workflow Templates
 
-Copy these to your repository's `.github/workflows/` directory.
+Copy one of these that suits your needs to your repository's `.github/workflows/` directory.
 
 ## Available Templates
 
