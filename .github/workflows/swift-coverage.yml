@@ -117,6 +117,9 @@ jobs:
 
     - name: Verify Swift Version
       run: swift --version
+      
+    - name: Run Swift Build
+      run: swift build
 
     - name: Run Swift Tests with Coverage
       run: |
