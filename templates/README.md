@@ -20,5 +20,5 @@ Multiple jobs, single PR comment. All logic is inline - just copy and use.
 
 Replace `@main` with a specific version tag for stability:
 ```yaml
-uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@0.1.0
+uses: oleksiikolomiietssnapp/swift-coverage-action/workflow@latest
 ```

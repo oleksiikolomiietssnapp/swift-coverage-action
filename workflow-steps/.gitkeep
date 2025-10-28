@@ -1,0 +1,8 @@
+# Reusable Workflow Steps
+
+This folder contains extracted, reusable workflow steps.
+
+Future steps to be extracted:
+- process-coverage: Analyze coverage data and generate reports
+- post-pr-comment: Post/update PR comments with coverage
+- check-threshold: Validate coverage meets threshold requirements

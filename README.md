@@ -59,6 +59,26 @@ Check out [`templates/`](templates/) for ready-to-use examples:
 - [`matrix.yml`](templates/matrix.yml) - Multiple Xcode/macOS versions
 - [`combined.yml`](templates/combined.yml) - Multi-job, single comment
 
+## Versioning
+
+- **`@latest`** - Always the newest features and fixes. Recommended for most users.
+- **`@0.1.9`** - Specific version for stability. Use if you need predictable behavior.
+- **Branches** - Main repo uses `latest` branch to track the latest release.
+
+## Workflow Steps
+
+The main workflow (`workflow@latest`) includes:
+
+| Step | Purpose |
+|------|---------|
+| **Validate Xcode version** | Check if requested Xcode version is installed |
+| **Select Xcode** | Set active Xcode version |
+| **Verify Swift Version** | Confirm Swift compiler availability |
+| **Run Swift Tests** | Execute tests with code coverage enabled |
+| **Process Coverage Data** | Analyze coverage metrics and generate reports |
+| **Comment on PR** | Post/update coverage summary on pull requests |
+| **Check Coverage Threshold** | Validate coverage meets minimum requirements |
+
 ## Configuration
 
 ```yaml
