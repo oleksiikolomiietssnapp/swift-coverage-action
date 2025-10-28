@@ -184,10 +184,16 @@ Each job posts a uniquely identified comment that **only deletes its own previou
 
 ## Permissions
 
-Required permissions in your workflow:
-- `contents: read` - Checkout code
-- `pull-requests: write` - Post PR comments
-- `issues: write` - Post PR comments
+To post coverage comments on PRs, add to your workflow:
+
+```yaml
+permissions:
+  contents: read
+  pull-requests: write
+```
+
+- `contents: read` - Checkout code and read coverage data
+- `pull-requests: write` - Post and update PR comments
 
 ## License
 
