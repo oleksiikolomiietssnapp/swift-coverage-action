@@ -59,6 +59,12 @@ Check out [`templates/`](templates/) for ready-to-use examples:
 - [`matrix.yml`](templates/matrix.yml) - Multiple Xcode/macOS versions
 - [`combined.yml`](templates/combined.yml) - Multi-job, single comment
 
+## Versioning
+
+- **`@latest`** - Always the newest features and fixes. Recommended for most users.
+- **`@0.1.9`** - Specific version for stability. Use if you need predictable behavior.
+- **Branches** - Main repo uses `latest` branch to track the latest release.
+
 ## Configuration
 
 ```yaml
