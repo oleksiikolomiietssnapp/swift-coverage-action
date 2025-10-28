@@ -96,7 +96,6 @@ jobs:
     - name: List Xcode installations
       run: sudo ls -1 /Applications | grep "Xcode"
 
-
     - name: Validate Xcode version
       if: inputs.xcode-version != ''
       run: |
