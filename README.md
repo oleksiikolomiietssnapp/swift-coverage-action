@@ -184,10 +184,20 @@ Each job posts a uniquely identified comment that **only deletes its own previou
 
 ## Permissions
 
-Required permissions in your workflow:
-- `contents: read` - Checkout code
-- `pull-requests: write` - Post PR comments
-- `issues: write` - Post PR comments
+**Required for private repositories** to post PR comments:
+
+```yaml
+permissions:
+  contents: read
+  pull-requests: write
+```
+
+- `contents: read` - Checkout code and read coverage data
+- `pull-requests: write` - Post and update PR comments
+
+**Public repositories** typically don't require explicit permission declaration (GitHub's default permissions are sufficient).
+
+If PR comments fail with a 403 error, add the permissions block above.
 
 ## License
 

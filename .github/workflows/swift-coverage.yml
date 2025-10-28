@@ -124,7 +124,7 @@ jobs:
         CODECOV_PATH=$(swift test --enable-swift-testing --enable-code-coverage --show-codecov-path)
         echo "CODECOV_PATH=$CODECOV_PATH" >> $GITHUB_ENV
 
-    - name: Extract Coverage Data
+    - name: Process Coverage Data
       id: extract
       run: |
         # Set project name and source path
@@ -299,6 +299,28 @@ jobs:
         else
           echo "threshold=" >> $GITHUB_OUTPUT
         fi
+
+        # Echo coverage summary to logs (visible for all workflows: PR, direct push, etc.)
+        echo ""
+        echo "📊 Coverage Summary:"
+        if [ -s "$AGGREGATED_DATA" ]; then
+          while IFS='|' read -r target_name total_lines covered_lines; do
+            if [ -n "$target_name" ]; then
+              if [ $total_lines -gt 0 ]; then
+                target_coverage=$(echo "scale=6; $covered_lines * 100 / $total_lines" | bc)
+              else
+                target_coverage=0
+              fi
+              target_coverage_rounded=$(echo "$target_coverage" | awk '{print int($1 * 100 + 0.5) / 100}')
+              echo "  • $target_name: ${target_coverage_rounded}%"
+            fi
+          done < <(sort "$AGGREGATED_DATA")
+        fi
+        echo "  Overall: ${average_coverage_rounded}%"
+        if [ -n "$THRESHOLD" ]; then
+          echo "  Threshold: ${THRESHOLD}%"
+        fi
+        echo ""
 
     - name: Comment on Pull Request
       if: github.event_name == 'pull_request' && inputs.post-comment
