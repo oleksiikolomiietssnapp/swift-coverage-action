@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here.
 
+## [1.0.1] - 2025-10-28
+
+### Changed
+- Added marketplace tags for better discoverability
+
 ## [1.0.0] - 2025-10-28
 
 ### Added

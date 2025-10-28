@@ -6,6 +6,14 @@ branding:
   icon: shield
   color: green
 
+tags:
+  - swift
+  - coverage
+  - testing
+  - code-quality
+  - ci-cd
+  - spm
+
 inputs:
   # Basic configuration
   macos-version:
