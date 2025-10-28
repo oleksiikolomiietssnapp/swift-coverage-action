@@ -303,14 +303,23 @@ jobs:
         # Echo coverage summary to logs (visible for all workflows: PR, direct push, etc.)
         echo ""
         echo "📊 Coverage Summary:"
-        echo "===================="
-        cat ${{ env.COVERAGE_SUMMARY_FILE }}
-        echo ""
-        echo "Overall Coverage: ${average_coverage_rounded}%"
-        if [ -n "$THRESHOLD" ]; then
-          echo "Threshold: ${THRESHOLD}%"
+        if [ -s "$AGGREGATED_DATA" ]; then
+          while IFS='|' read -r target_name total_lines covered_lines; do
+            if [ -n "$target_name" ]; then
+              if [ $total_lines -gt 0 ]; then
+                target_coverage=$(echo "scale=6; $covered_lines * 100 / $total_lines" | bc)
+              else
+                target_coverage=0
+              fi
+              target_coverage_rounded=$(echo "$target_coverage" | awk '{print int($1 * 100 + 0.5) / 100}')
+              echo "  • $target_name: ${target_coverage_rounded}%"
+            fi
+          done < <(sort "$AGGREGATED_DATA")
         fi
-        echo "===================="
+        echo "  Overall: ${average_coverage_rounded}%"
+        if [ -n "$THRESHOLD" ]; then
+          echo "  Threshold: ${THRESHOLD}%"
+        fi
         echo ""
 
     - name: Comment on Pull Request
