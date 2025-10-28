@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented here.
 
+## [1.0.0] - 2025-10-28
+
+### Added
+- **GitHub Marketplace Action**: Now available as composite action on GitHub Marketplace
+- `action.yml` definition for Marketplace publication
+
+### Changed
+- Action can now be used in two ways:
+  - GitHub Marketplace: `uses: oleksiikolomiietssnapp/swift-coverage-action@1.0.0`
+  - Reusable Workflow: `uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main`
+
+### Documentation
+- Updated README with both usage patterns (Marketplace and Reusable Workflow)
+- Full configuration examples for both methods
+- Clearer input descriptions and defaults
+
 ## [0.1.9] - 2025-10-28
 
 ### Added
