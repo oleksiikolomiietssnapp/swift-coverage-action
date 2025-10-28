@@ -1,0 +1,11 @@
+name: List Xcode Installations
+
+on:
+  workflow_call:
+
+runs:
+  using: composite
+  steps:
+    - name: List Xcode installations
+      shell: bash
+      run: sudo ls -1 /Applications | grep "Xcode"
