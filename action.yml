@@ -1,0 +1,73 @@
+name: 'Swift Coverage Action'
+description: 'Automated code coverage reporting for Swift packages'
+author: 'oleksiikolomiiets'
+branding:
+  icon: 'activity'
+  color: 'orange'
+
+inputs:
+  macos-version:
+    description: 'macOS runner version (e.g., "latest", "15", "14")'
+    required: false
+    default: 'latest'
+  xcode-version:
+    description: 'Xcode version to use (default: system default)'
+    required: false
+    default: ''
+  source-path-override:
+    description: 'Override source path pattern (default: PROJECT/Sources)'
+    required: false
+  project-name-override:
+    description: 'Override project name (default: repository name)'
+    required: false
+  coverage-comment-header:
+    description: 'Header for coverage comment'
+    required: false
+    default: '### 🛡️ Code Coverage Report'
+  working-directory:
+    description: 'Working directory for Swift commands (default: repository root)'
+    required: false
+    default: '.'
+  skip-label:
+    description: 'Label name to skip workflow execution (default: skip-coverage)'
+    required: false
+    default: 'skip-coverage'
+  post-comment:
+    description: 'Post coverage comment to PR (set to false when using combined comments)'
+    required: false
+    default: 'true'
+  job-name:
+    description: 'Name/description for this coverage job (used in combined reports)'
+    required: false
+  coverage-threshold:
+    description: 'Coverage threshold percentage (if set, enables quality indicators and Details section)'
+    required: false
+    default: ''
+  fail-on-low-coverage:
+    description: 'Fail the job if coverage is below threshold'
+    required: false
+    default: 'false'
+
+outputs:
+  coverage-percentage:
+    description: 'The calculated coverage percentage'
+  coverage-table:
+    description: 'The coverage table in markdown format'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run Swift Coverage Workflow
+      uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@latest
+      with:
+        macos-version: '${{ inputs.macos-version }}'
+        xcode-version: '${{ inputs.xcode-version }}'
+        source-path-override: '${{ inputs.source-path-override }}'
+        project-name-override: '${{ inputs.project-name-override }}'
+        coverage-comment-header: '${{ inputs.coverage-comment-header }}'
+        working-directory: '${{ inputs.working-directory }}'
+        skip-label: '${{ inputs.skip-label }}'
+        post-comment: '${{ inputs.post-comment }}'
+        job-name: '${{ inputs.job-name }}'
+        coverage-threshold: '${{ inputs.coverage-threshold }}'
+        fail-on-low-coverage: '${{ inputs.fail-on-low-coverage }}'
