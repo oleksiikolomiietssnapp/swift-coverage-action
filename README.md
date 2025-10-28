@@ -46,7 +46,7 @@ on:
 
 jobs:
   coverage:
-    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@latest
+    uses: oleksiikolomiietssnapp/swift-coverage-action@latest
 ```
 
 Permissions are inherited automatically when needed.
@@ -62,7 +62,7 @@ Check out [`templates/`](templates/) for ready-to-use examples:
 ## Configuration
 
 ```yaml
-uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@latest
+uses: oleksiikolomiietssnapp/swift-coverage-action@latest
 with:
   # Environment
   macos-version: "latest"            # "latest", "15", "14", etc.
