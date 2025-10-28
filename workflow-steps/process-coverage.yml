@@ -1,0 +1,240 @@
+name: Process Coverage Data
+
+on:
+  workflow_call:
+    inputs:
+      coverage-threshold:
+        description: 'Coverage threshold percentage'
+        required: false
+        type: string
+        default: ''
+      project-name-override:
+        description: 'Override project name'
+        required: false
+        type: string
+      source-path-override:
+        description: 'Override source path pattern'
+        required: false
+        type: string
+
+    outputs:
+      coverage:
+        description: 'The calculated coverage percentage'
+        value: ${{ steps.extract.outputs.coverage }}
+      coverage-table:
+        description: 'The coverage table in markdown format'
+        value: ${{ steps.extract.outputs.coverage-table }}
+      threshold:
+        description: 'The coverage threshold'
+        value: ${{ steps.extract.outputs.threshold }}
+
+env:
+  COVERAGE_SUMMARY_FILE: '${{ github.workspace }}/coverage_summary.txt'
+
+runs:
+  using: composite
+  steps:
+    - name: Process Coverage Data
+      id: extract
+      run: |
+        # Set project name and source path
+        PROJECT_NAME="${{ inputs.project-name-override }}"
+        if [ -z "$PROJECT_NAME" ]; then
+          PROJECT_NAME="${{ github.event.repository.name }}"
+        fi
+
+        SOURCE_PATH="${{ inputs.source-path-override }}"
+        if [ -z "$SOURCE_PATH" ]; then
+          SOURCE_PATH="${PROJECT_NAME}/Sources"
+        fi
+
+
+        # Check if there are any actual source files to report on
+        SOURCE_FILE_COUNT=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("\\.swift$")) | select(.filename | test("/(Tests?|test)/") | not) | .filename' "$CODECOV_PATH" | wc -l)
+
+        if [ "$SOURCE_FILE_COUNT" -eq 0 ]; then
+          # Create a placeholder entry when no source files exist
+          ALL_FILES="$PROJECT_NAME|0|0"
+        else
+          # Extract all Swift files excluding build artifacts
+          ALL_FILES=$(jq -r '.data[0].files[] | select(.filename | test("/\\.build/") | not) | select(.filename | test("\\.swift$")) | select(.filename | test("/(Tests?|test)/") | not) | "\(.filename)|\(.summary.lines.count)|\(.summary.lines.covered)"' "$CODECOV_PATH")
+        fi
+
+        # Initialize - check if threshold is set
+        THRESHOLD="${{ inputs.coverage-threshold }}"
+        if [ -n "$THRESHOLD" ]; then
+          show_quality="true"
+        else
+          show_quality="false"
+        fi
+
+        # Create temporary files for target data
+        TARGETS_DATA=$(mktemp)
+        TABLE_BODY=$(mktemp)
+
+        # Parse files and group by target
+        while IFS='|' read -r filename total_lines covered_lines; do
+          if [ -n "$filename" ]; then
+            # Extract target name from file path patterns:
+            # Pattern 1: /path/to/TargetName/Sources/...
+            # Pattern 2: /path/to/Sources/TargetName/...
+            # Pattern 3: /path/to/TargetName/...
+            target_name=""
+
+            if echo "$filename" | grep -q '/Sources/[^/]*/'; then
+              # Pattern: .../Sources/TargetName/...
+              target_name=$(echo "$filename" | sed -E 's|.*/Sources/([^/]+)/.*|\1|')
+            elif echo "$filename" | grep -q '/Sources/[^/]*\.swift$'; then
+              # Pattern: .../Sources/file.swift (direct in Sources)
+              target_name=$(echo "$filename" | sed -E 's|.*/Sources/([^/]*)\.swift$|\1|')
+            else
+              target_name="$PROJECT_NAME"
+            fi
+
+
+            # Skip if target name looks like a test
+            if echo "$target_name" | grep -qi test; then
+              continue
+            fi
+
+            # Write target data to temp file
+            echo "$target_name|$total_lines|$covered_lines" >> "$TARGETS_DATA"
+          fi
+        done <<< "$ALL_FILES"
+
+        # Aggregate data by target
+        AGGREGATED_DATA=$(mktemp)
+        if [ -s "$TARGETS_DATA" ]; then
+          sort "$TARGETS_DATA" | awk -F'|' '
+          {
+            target = $1
+            total_lines[target] += $2
+            covered_lines[target] += $3
+          }
+          END {
+            for (target in total_lines) {
+              print target "|" total_lines[target] "|" covered_lines[target]
+            }
+          }' > "$AGGREGATED_DATA"
+        fi
+
+        # Generate table rows for each target
+        target_counter=1
+        total_coverage_sum=0
+        target_count=0
+        total_lines_sum=0
+
+        if [ -s "$AGGREGATED_DATA" ]; then
+          # Process each target and add to table
+          while IFS='|' read -r target_name total_lines covered_lines; do
+            if [ -n "$target_name" ]; then
+              if [ $total_lines -gt 0 ]; then
+                target_coverage=$(echo "scale=6; $covered_lines * 100 / $total_lines" | bc)
+              else
+                target_coverage=0
+              fi
+
+              target_coverage_rounded=$(echo "$target_coverage" | awk '{print int($1 * 100 + 0.5) / 100}')
+
+              echo "| $target_counter | $target_name | $total_lines | **${target_coverage_rounded}%** |" >> "$TABLE_BODY"
+
+              # For overall average calculation
+              echo "$target_coverage" >> /tmp/coverage_values.txt
+              total_lines_sum=$((total_lines_sum + total_lines))
+              target_counter=$((target_counter + 1))
+
+            fi
+          done < <(sort "$AGGREGATED_DATA")
+        else
+          # Fallback: add a single entry with project name
+          echo "| 1 | $PROJECT_NAME | 0 | **0%** |" >> "$TABLE_BODY"
+        fi
+
+        # Calculate overall average coverage
+        if [ -f /tmp/coverage_values.txt ]; then
+          target_count=$(wc -l < /tmp/coverage_values.txt)
+          if [ $target_count -gt 0 ]; then
+            total_coverage_sum=$(awk '{sum+=$1} END {print sum}' /tmp/coverage_values.txt)
+            average_coverage=$(echo "scale=6; $total_coverage_sum / $target_count" | bc)
+          else
+            average_coverage=0
+          fi
+          rm -f /tmp/coverage_values.txt
+        else
+          average_coverage=0
+        fi
+
+        # Clean up temp files
+        rm -f "$TARGETS_DATA" "$AGGREGATED_DATA"
+
+        average_coverage_rounded=$(echo "$average_coverage" | awk '{print int($1 * 100 + 0.5) / 100}')
+
+        # Determine header icon based on average coverage
+        coverage_header="Coverage"
+        if [ "$show_quality" = "true" ]; then
+          coverage_int=$(echo "$average_coverage_rounded" | awk '{print int($1)}')
+          if [ "$coverage_int" -lt "$THRESHOLD" ]; then
+            coverage_header="⚠️"
+          else
+            coverage_header="✅"
+          fi
+        fi
+
+        # Write final table with header + body
+        cat <<EOF > ${{ env.COVERAGE_SUMMARY_FILE }}
+        |   №  | Target | Lines | $coverage_header |
+        |:----:|--------|------:|:---------:|
+        EOF
+        cat "$TABLE_BODY" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+
+        # Add average/combined coverage row if multiple targets
+        if [ $target_count -gt 1 ]; then
+          echo "| | <p align="right">**Total**</p> | $total_lines_sum | **${average_coverage_rounded}%** |" >> ${{ env.COVERAGE_SUMMARY_FILE }}
+        fi
+
+        # Clean up temp files
+        rm -f "$TABLE_BODY"
+
+        # Output for next steps
+        echo "coverage=$average_coverage_rounded" >> $GITHUB_OUTPUT
+
+        # Output table for combined comments
+        echo "coverage-table<<EOF" >> $GITHUB_OUTPUT
+        cat ${{ env.COVERAGE_SUMMARY_FILE }} >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+        # Output threshold for comment footer (if set)
+        if [ -n "$THRESHOLD" ]; then
+          echo "threshold=$THRESHOLD" >> $GITHUB_OUTPUT
+        else
+          echo "threshold=" >> $GITHUB_OUTPUT
+        fi
+
+        # Echo coverage summary to logs (visible for all workflows: PR, direct push, etc.)
+        echo ""
+        echo "📊 Coverage Summary:"
+        if [ -s "$AGGREGATED_DATA" ]; then
+          while IFS='|' read -r target_name total_lines covered_lines; do
+            if [ -n "$target_name" ]; then
+              if [ $total_lines -gt 0 ]; then
+                target_coverage=$(echo "scale=6; $covered_lines * 100 / $total_lines" | bc)
+              else
+                target_coverage=0
+              fi
+              target_coverage_rounded=$(echo "$target_coverage" | awk '{print int($1 * 100 + 0.5) / 100}')
+              echo "  • $target_name: ${target_coverage_rounded}%"
+            fi
+          done < <(sort "$AGGREGATED_DATA")
+        fi
+        echo "  Overall: ${average_coverage_rounded}%"
+        if [ -n "$THRESHOLD" ]; then
+          echo "  Threshold: ${THRESHOLD}%"
+        fi
+        echo ""
+
+    - uses: oleksiikolomiietssnapp/swift-coverage-action/workflow-steps/post-pr-comment.yml@latest
+      if: inputs.post-comment
+      with:
+        coverage-comment-header: ${{ inputs.coverage-comment-header }}
+        job-name: ${{ inputs.job-name }}
+
