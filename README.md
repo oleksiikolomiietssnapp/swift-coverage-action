@@ -52,7 +52,7 @@ jobs:
   coverage:
     runs-on: macos-latest
     steps:
-      - uses: oleksiikolomiietssnapp/swift-coverage-action@v1
+      - uses: oleksiikolomiietssnapp/swift-coverage-action@1
 ```
 
 ### As a Reusable Workflow
@@ -82,7 +82,7 @@ All inputs are optional with sensible defaults. Choose your preferred usage meth
 ### As GitHub Marketplace Action
 
 ```yaml
-- uses: oleksiikolomiietssnapp/swift-coverage-action@v1
+- uses: oleksiikolomiietssnapp/swift-coverage-action@1
   with:
     # Environment
     macos-version: "latest"            # "latest", "15", "14", etc.
