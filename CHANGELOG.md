@@ -2,6 +2,20 @@
 
 All notable changes to this project are documented here.
 
+## [0.1.9] - 2025-10-28
+
+### Added
+- Console output for coverage data in workflow logs
+- Coverage summary visible for all workflow types (PR comments and direct pushes)
+
+### Changed
+- Rename "Extract Coverage Data" step to "Process Coverage Data" for clarity
+- Simplify console output format to bullet-list for better readability
+
+### Documentation
+- Add Permissions section to README clarifying public vs private repo requirements
+- Create CHANGELOG.md with complete version history
+
 ## [0.1.8] - 2024-10-28
 
 ### Changed
