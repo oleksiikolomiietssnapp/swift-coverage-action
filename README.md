@@ -52,6 +52,7 @@ jobs:
   coverage:
     runs-on: macos-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: oleksiikolomiietssnapp/swift-coverage-action@1
 ```
 
