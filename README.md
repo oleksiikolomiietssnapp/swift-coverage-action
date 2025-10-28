@@ -199,6 +199,10 @@ permissions:
 
 If PR comments fail with a 403 error, add the permissions block above.
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history and release notes.
+
 ## License
 
 MIT License - see [LICENSE](LICENSE) file.
