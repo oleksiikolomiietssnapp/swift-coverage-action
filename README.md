@@ -35,6 +35,10 @@ Automated code coverage reporting for Swift packages
 
 ## Quick Start
 
+### As a GitHub Marketplace Action
+
+Add this action to your workflow:
+
 ```yaml
 name: Coverage
 
@@ -46,7 +50,19 @@ on:
 
 jobs:
   coverage:
-    uses: oleksiikolomiietssnapp/swift-coverage-action@latest
+    runs-on: macos-latest
+    steps:
+      - uses: oleksiikolomiietssnapp/swift-coverage-action@v1
+```
+
+### As a Reusable Workflow
+
+Alternatively, you can use the reusable workflow:
+
+```yaml
+jobs:
+  coverage:
+    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main
 ```
 
 Permissions are inherited automatically when needed.
@@ -61,22 +77,58 @@ Check out [`templates/`](templates/) for ready-to-use examples:
 
 ## Configuration
 
+All inputs are optional with sensible defaults. Choose your preferred usage method:
+
+### As GitHub Marketplace Action
+
 ```yaml
-uses: oleksiikolomiietssnapp/swift-coverage-action@latest
-with:
-  # Environment
-  macos-version: "latest"            # "latest", "15", "14", etc.
-  xcode-version: "16.4"              # Specific version or system default
-  working-directory: "./my-package"  # Defaults to repo root
+- uses: oleksiikolomiietssnapp/swift-coverage-action@v1
+  with:
+    # Environment
+    macos-version: "latest"            # "latest", "15", "14", etc.
+    xcode-version: "16.4"              # Specific version or system default
+    working-directory: "./my-package"  # Defaults to repo root
 
-  # PR comments
-  coverage-comment-header: "### 📊 Coverage"
-  post-comment: true                 # Set false for combined multi-job comments
-  job-name: "Config Name"            # Identifier for combined reports
+    # Project identification
+    project-name-override: "MyPackage" # Override project name
+    source-path-override: "Sources"    # Override source path pattern
 
-  # Quality
-  coverage-threshold: "80"           # Enables ✅/⚠️ indicators
-  fail-on-low-coverage: false        # Fail job if below threshold
+    # PR comments
+    coverage-comment-header: "### 📊 Coverage"
+    post-comment: true                 # Set false for combined multi-job comments
+    job-name: "Config Name"            # Identifier for combined reports
+    skip-label: "skip-coverage"        # Label to skip workflow
+
+    # Quality gates
+    coverage-threshold: "80"           # Enables ✅/⚠️ indicators
+    fail-on-low-coverage: false        # Fail if below threshold
+```
+
+### As Reusable Workflow
+
+```yaml
+jobs:
+  coverage:
+    uses: oleksiikolomiietssnapp/swift-coverage-action/.github/workflows/swift-coverage.yml@main
+    with:
+      # Environment
+      macos-version: "latest"
+      xcode-version: "16.4"
+      working-directory: "./my-package"
+
+      # Project identification
+      project-name-override: "MyPackage"
+      source-path-override: "Sources"
+
+      # PR comments
+      coverage-comment-header: "### 📊 Coverage"
+      post-comment: true
+      job-name: "Config Name"
+      skip-label: "skip-coverage"
+
+      # Quality gates
+      coverage-threshold: "80"
+      fail-on-low-coverage: false
 ```
 
 ## Skipping Workflow
