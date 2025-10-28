@@ -28,8 +28,6 @@ on:
         description: 'The coverage threshold'
         value: ${{ steps.extract.outputs.threshold }}
 
-env:
-  COVERAGE_SUMMARY_FILE: '${{ github.workspace }}/coverage_summary.txt'
 
 runs:
   using: composite

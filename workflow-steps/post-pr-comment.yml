@@ -14,8 +14,6 @@ on:
         type: string
         default: ''
 
-env:
-  COVERAGE_SUMMARY_FILE: '${{ github.workspace }}/coverage_summary.txt'
 
 runs:
   using: composite

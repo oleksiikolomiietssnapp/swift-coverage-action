@@ -126,12 +126,16 @@ jobs:
         echo "CODECOV_PATH=$CODECOV_PATH" >> $GITHUB_ENV
 
     - uses: oleksiikolomiietssnapp/swift-coverage-action/workflow-steps/process-coverage.yml@latest
+      env:
+        COVERAGE_SUMMARY_FILE: ${{ env.COVERAGE_SUMMARY_FILE }}
       with:
         coverage-threshold: ${{ inputs.coverage-threshold }}
         project-name-override: ${{ inputs.project-name-override }}
         source-path-override: ${{ inputs.source-path-override }}
 
     - uses: oleksiikolomiietssnapp/swift-coverage-action/workflow-steps/post-pr-comment.yml@latest
+      env:
+        COVERAGE_SUMMARY_FILE: ${{ env.COVERAGE_SUMMARY_FILE }}
       if: inputs.post-comment
       with:
         coverage-comment-header: ${{ inputs.coverage-comment-header }}
